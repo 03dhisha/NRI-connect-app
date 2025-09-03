@@ -1,0 +1,118 @@
+import React from 'react';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Home, Users, MessageCircle, Search, Calendar, MapPin } from 'lucide-react';
+
+interface HomeScreenProps {
+  onNavigate: (tab: string) => void;
+}
+
+const HomeScreen = ({ onNavigate }: HomeScreenProps) => {
+  const quickActions = [
+    {
+      id: 'housing',
+      icon: Home,
+      title: 'Find Housing',
+      description: 'Browse available rentals',
+      color: 'bg-primary text-primary-foreground',
+      bgGradient: 'bg-gradient-primary'
+    },
+    {
+      id: 'cultural',
+      icon: Users,
+      title: 'Join Community',
+      description: 'Connect with locals',
+      color: 'bg-success text-success-foreground',
+      bgGradient: 'bg-gradient-to-br from-success to-success/80'
+    }
+  ];
+
+  const recentActivity = [
+    { icon: Search, text: 'Searched for 2BHK apartments in Bangalore', time: '2 hours ago' },
+    { icon: Calendar, text: 'RSVP\'d to Diwali celebration event', time: '1 day ago' },
+    { icon: MessageCircle, text: 'Learned 5 new Hindi phrases', time: '2 days ago' }
+  ];
+
+  return (
+    <div className="min-h-screen bg-gradient-subtle pb-20">
+      {/* Header */}
+      <div className="pt-12 pb-6 px-6">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Welcome back!</h1>
+            <p className="text-muted-foreground">Let's make today productive</p>
+          </div>
+          <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center">
+            <span className="text-white font-semibold text-lg">U</span>
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="grid grid-cols-2 gap-4 mb-8">
+          {quickActions.map((action) => (
+            <Card key={action.id} className="border-0 overflow-hidden shadow-card">
+              <button 
+                onClick={() => onNavigate(action.id)}
+                className="w-full p-6 text-left hover:scale-105 transition-all duration-300"
+              >
+                <div className={`w-12 h-12 ${action.bgGradient} rounded-2xl flex items-center justify-center mb-4`}>
+                  <action.icon className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="font-semibold text-foreground mb-2">{action.title}</h3>
+                <p className="text-sm text-muted-foreground">{action.description}</p>
+              </button>
+            </Card>
+          ))}
+        </div>
+
+        {/* Feature Overview */}
+        <Card className="p-6 shadow-card border-0 mb-6">
+          <h3 className="text-lg font-semibold text-foreground mb-4">Your NRI Toolkit</h3>
+          <div className="grid grid-cols-3 gap-4">
+            <button 
+              onClick={() => onNavigate('housing')}
+              className="text-center p-3 rounded-xl hover:bg-muted transition-colors"
+            >
+              <MapPin className="w-6 h-6 text-primary mx-auto mb-2" />
+              <span className="text-xs font-medium text-muted-foreground">Housing</span>
+            </button>
+            <button 
+              onClick={() => onNavigate('cultural')}
+              className="text-center p-3 rounded-xl hover:bg-muted transition-colors"
+            >
+              <Calendar className="w-6 h-6 text-success mx-auto mb-2" />
+              <span className="text-xs font-medium text-muted-foreground">Events</span>
+            </button>
+            <button 
+              onClick={() => onNavigate('communication')}
+              className="text-center p-3 rounded-xl hover:bg-muted transition-colors"
+            >
+              <MessageCircle className="w-6 h-6 text-accent mx-auto mb-2" />
+              <span className="text-xs font-medium text-muted-foreground">Translate</span>
+            </button>
+          </div>
+        </Card>
+
+        {/* Recent Activity */}
+        <Card className="p-6 shadow-card border-0">
+          <h3 className="text-lg font-semibold text-foreground mb-4">Recent Activity</h3>
+          <div className="space-y-4">
+            {recentActivity.map((activity, index) => (
+              <div key={index} className="flex items-start space-x-3">
+                <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center flex-shrink-0">
+                  <activity.icon className="w-4 h-4 text-muted-foreground" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm text-foreground">{activity.text}</p>
+                  <p className="text-xs text-muted-foreground">{activity.time}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      </div>
+    </div>
+  );
+};
+
+export default HomeScreen;
