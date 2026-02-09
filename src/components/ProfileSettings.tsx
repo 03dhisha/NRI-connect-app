@@ -14,7 +14,7 @@ import {
   Bell,
   Shield
 } from 'lucide-react';
-import { useTheme } from '@/contexts/ThemeContext';
+import { useTheme } from 'next-themes';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface ProfileSettingsProps {
@@ -22,7 +22,9 @@ interface ProfileSettingsProps {
 }
 
 const ProfileSettings = ({ onLogout }: ProfileSettingsProps) => {
-  const { isDarkMode, toggleDarkMode } = useTheme();
+  const { theme, setTheme, resolvedTheme } = useTheme();
+  const isDarkMode = theme === 'dark' || (theme === 'system' && resolvedTheme === 'dark');
+
   const { user, signOut } = useAuth();
 
   const handleLogout = async () => {
@@ -134,7 +136,7 @@ const ProfileSettings = ({ onLogout }: ProfileSettingsProps) => {
                 <p className="text-sm text-muted-foreground">Switch to dark theme</p>
               </div>
             </div>
-            <Switch checked={isDarkMode} onCheckedChange={toggleDarkMode} />
+            <Switch checked={isDarkMode} onCheckedChange={(checked) => setTheme(checked ? 'dark' : 'light')} />
           </div>
         </Card>
 
