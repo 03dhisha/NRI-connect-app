@@ -6,8 +6,11 @@ import CulturalBridge from '@/components/CulturalBridge';
 import CommunicationAssistant from '@/components/CommunicationAssistant';
 import ProfileSettings from '@/components/ProfileSettings';
 import BottomNavigation from '@/components/BottomNavigation';
+import LoginPage from '@/components/LoginPage';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Index = () => {
+  const { user, isLoading } = useAuth();
   const [hasSeenOnboarding, setHasSeenOnboarding] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
 
@@ -20,6 +23,30 @@ const Index = () => {
     setActiveTab(tab);
   };
 
+  const handleLoginSuccess = () => {
+    setActiveTab('home');
+  };
+
+  const handleLogout = () => {
+    setHasSeenOnboarding(false);
+    setActiveTab('home');
+  };
+
+  // Show loading state while checking auth
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-subtle flex items-center justify-center">
+        <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  // Show login page if user is not authenticated
+  if (!user) {
+    return <LoginPage onSuccess={handleLoginSuccess} />;
+  }
+
+  // Show onboarding after login
   if (!hasSeenOnboarding) {
     return <Onboarding onGetStarted={handleGetStarted} />;
   }
@@ -35,7 +62,7 @@ const Index = () => {
       case 'communication':
         return <CommunicationAssistant />;
       case 'profile':
-        return <ProfileSettings />;
+        return <ProfileSettings onLogout={handleLogout} />;
       default:
         return <HomeScreen onNavigate={handleNavigate} />;
     }
