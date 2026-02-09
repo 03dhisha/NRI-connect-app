@@ -14,8 +14,21 @@ import {
   Bell,
   Shield
 } from 'lucide-react';
+import { useTheme } from '@/contexts/ThemeContext';
+import { useAuth } from '@/contexts/AuthContext';
 
-const ProfileSettings = () => {
+interface ProfileSettingsProps {
+  onLogout: () => void;
+}
+
+const ProfileSettings = ({ onLogout }: ProfileSettingsProps) => {
+  const { isDarkMode, toggleDarkMode } = useTheme();
+  const { user, signOut } = useAuth();
+
+  const handleLogout = async () => {
+    await signOut();
+    onLogout();
+  };
   const menuItems = [
     {
       id: 'bookings',
@@ -74,9 +87,13 @@ const ProfileSettings = () => {
               <User className="w-8 h-8 text-white" />
             </div>
             <div className="flex-1">
-              <h2 className="text-xl font-semibold text-foreground">John Doe</h2>
-              <p className="text-muted-foreground">john.doe@email.com</p>
-              <p className="text-sm text-muted-foreground">Member since Nov 2024</p>
+              <h2 className="text-xl font-semibold text-foreground">
+                {user?.user_metadata?.display_name || 'User'}
+              </h2>
+              <p className="text-muted-foreground">{user?.email}</p>
+              <p className="text-sm text-muted-foreground">
+                Member since {new Date(user?.created_at || Date.now()).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+              </p>
             </div>
             <Button variant="outline" size="sm" className="rounded-xl">
               Edit
@@ -117,7 +134,7 @@ const ProfileSettings = () => {
                 <p className="text-sm text-muted-foreground">Switch to dark theme</p>
               </div>
             </div>
-            <Switch />
+            <Switch checked={isDarkMode} onCheckedChange={toggleDarkMode} />
           </div>
         </Card>
 
@@ -155,6 +172,7 @@ const ProfileSettings = () => {
         <Button 
           variant="outline" 
           className="w-full flex items-center justify-center space-x-2 text-destructive border-destructive/20 hover:bg-destructive/10 rounded-2xl py-6"
+          onClick={handleLogout}
         >
           <LogOut className="w-5 h-5" />
           <span>Sign Out</span>
