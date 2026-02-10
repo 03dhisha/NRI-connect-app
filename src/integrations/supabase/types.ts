@@ -14,6 +14,219 @@ export type Database = {
   }
   public: {
     Tables: {
+      community_groups: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          members_count: number | null
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          members_count?: number | null
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          members_count?: number | null
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      event_attendees: {
+        Row: {
+          event_id: string
+          id: string
+          registered_at: string
+          user_id: string
+        }
+        Insert: {
+          event_id: string
+          id?: string
+          registered_at?: string
+          user_id: string
+        }
+        Update: {
+          event_id?: string
+          id?: string
+          registered_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_attendees_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      events: {
+        Row: {
+          attendees_count: number | null
+          created_at: string
+          description: string | null
+          event_date: string
+          id: string
+          location: string
+          platform_link: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          attendees_count?: number | null
+          created_at?: string
+          description?: string | null
+          event_date: string
+          id?: string
+          location: string
+          platform_link?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          attendees_count?: number | null
+          created_at?: string
+          description?: string | null
+          event_date?: string
+          id?: string
+          location?: string
+          platform_link?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      group_members: {
+        Row: {
+          group_id: string
+          id: string
+          joined_at: string
+          user_id: string
+        }
+        Insert: {
+          group_id: string
+          id?: string
+          joined_at?: string
+          user_id: string
+        }
+        Update: {
+          group_id?: string
+          id?: string
+          joined_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_members_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "community_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      housing_listings: {
+        Row: {
+          amenities: string[] | null
+          average_rating: number | null
+          bedrooms: number
+          created_at: string
+          description: string | null
+          id: string
+          is_available: boolean
+          location: string
+          phone_number: string
+          rent_amount: number
+          title: string
+          total_ratings: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amenities?: string[] | null
+          average_rating?: number | null
+          bedrooms: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_available?: boolean
+          location: string
+          phone_number: string
+          rent_amount: number
+          title: string
+          total_ratings?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amenities?: string[] | null
+          average_rating?: number | null
+          bedrooms?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_available?: boolean
+          location?: string
+          phone_number?: string
+          rent_amount?: number
+          title?: string
+          total_ratings?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      housing_ratings: {
+        Row: {
+          created_at: string
+          id: string
+          listing_id: string
+          rating: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          listing_id: string
+          rating: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          listing_id?: string
+          rating?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "housing_ratings_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "housing_listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -36,6 +249,86 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      restaurant_ratings: {
+        Row: {
+          created_at: string
+          feedback: string | null
+          id: string
+          rating: number
+          restaurant_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          feedback?: string | null
+          id?: string
+          rating: number
+          restaurant_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          feedback?: string | null
+          id?: string
+          rating?: number
+          restaurant_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "restaurant_ratings_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      restaurants: {
+        Row: {
+          average_rating: number | null
+          created_at: string
+          cuisine: string
+          id: string
+          is_veg: boolean
+          location: string | null
+          name: string
+          recommended_dishes: string[] | null
+          specialty: string | null
+          total_ratings: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          average_rating?: number | null
+          created_at?: string
+          cuisine: string
+          id?: string
+          is_veg?: boolean
+          location?: string | null
+          name: string
+          recommended_dishes?: string[] | null
+          specialty?: string | null
+          total_ratings?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          average_rating?: number | null
+          created_at?: string
+          cuisine?: string
+          id?: string
+          is_veg?: boolean
+          location?: string | null
+          name?: string
+          recommended_dishes?: string[] | null
+          specialty?: string | null
+          total_ratings?: number | null
           updated_at?: string
           user_id?: string
         }

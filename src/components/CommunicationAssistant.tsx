@@ -3,7 +3,7 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Search, Volume2, Plane, Utensils, AlertTriangle, Coffee } from 'lucide-react';
+import { Search, Plane, Utensils, AlertTriangle, Coffee } from 'lucide-react';
 
 interface Phrase {
   id: string;
@@ -26,62 +26,14 @@ const CommunicationAssistant = () => {
   ];
 
   const phrases: Phrase[] = [
-    {
-      id: '1',
-      english: 'Hello, how are you?',
-      hindi: 'नमस्ते, आप कैसे हैं?',
-      phonetic: 'namaste, aap kaise hain?',
-      category: 'daily'
-    },
-    {
-      id: '2',
-      english: 'Where is the nearest metro station?',
-      hindi: 'सबसे नजदीकी मेट्रो स्टेशन कहाँ है?',
-      phonetic: 'sabse nazdeeki metro station kahan hai?',
-      category: 'travel'
-    },
-    {
-      id: '3',
-      english: 'I would like to order food',
-      hindi: 'मैं खाना ऑर्डर करना चाहूंगा',
-      phonetic: 'main khana order karna chahunga',
-      category: 'food'
-    },
-    {
-      id: '4',
-      english: 'Please call a doctor',
-      hindi: 'कृपया डॉक्टर को बुलाएं',
-      phonetic: 'kripaya doctor ko bulayen',
-      category: 'emergency'
-    },
-    {
-      id: '5',
-      english: 'How much does this cost?',
-      hindi: 'इसकी कीमत क्या है?',
-      phonetic: 'iski keemat kya hai?',
-      category: 'daily'
-    },
-    {
-      id: '6',
-      english: 'Can you help me?',
-      hindi: 'क्या आप मेरी मदद कर सकते हैं?',
-      phonetic: 'kya aap meri madad kar sakte hain?',
-      category: 'daily'
-    },
-    {
-      id: '7',
-      english: 'Where is the bathroom?',
-      hindi: 'बाथरूम कहाँ है?',
-      phonetic: 'bathroom kahan hai?',
-      category: 'travel'
-    },
-    {
-      id: '8',
-      english: 'This is spicy',
-      hindi: 'यह तीखा है',
-      phonetic: 'yeh teekhaa hai',
-      category: 'food'
-    }
+    { id: '1', english: 'Hello, how are you?', hindi: 'नमस्ते, आप कैसे हैं?', phonetic: 'namaste, aap kaise hain?', category: 'daily' },
+    { id: '2', english: 'Where is the nearest metro station?', hindi: 'सबसे नजदीकी मेट्रो स्टेशन कहाँ है?', phonetic: 'sabse nazdeeki metro station kahan hai?', category: 'travel' },
+    { id: '3', english: 'I would like to order food', hindi: 'मैं खाना ऑर्डर करना चाहूंगा', phonetic: 'main khana order karna chahunga', category: 'food' },
+    { id: '4', english: 'Please call a doctor', hindi: 'कृपया डॉक्टर को बुलाएं', phonetic: 'kripaya doctor ko bulayen', category: 'emergency' },
+    { id: '5', english: 'How much does this cost?', hindi: 'इसकी कीमत क्या है?', phonetic: 'iski keemat kya hai?', category: 'daily' },
+    { id: '6', english: 'Can you help me?', hindi: 'क्या आप मेरी मदद कर सकते हैं?', phonetic: 'kya aap meri madad kar sakte hain?', category: 'daily' },
+    { id: '7', english: 'Where is the bathroom?', hindi: 'बाथरूम कहाँ है?', phonetic: 'bathroom kahan hai?', category: 'travel' },
+    { id: '8', english: 'This is spicy', hindi: 'यह तीखा है', phonetic: 'yeh teekhaa hai', category: 'food' }
   ];
 
   const filteredPhrases = phrases.filter(phrase => {
@@ -92,19 +44,11 @@ const CommunicationAssistant = () => {
     return matchesSearch && matchesCategory;
   });
 
-  const playAudio = (text: string) => {
-    // Mock audio playback
-    console.log(`Playing audio for: ${text}`);
-    // In a real app, this would use speech synthesis or audio files
-  };
-
   return (
     <div className="min-h-screen bg-gradient-subtle pb-20">
-      {/* Header */}
       <div className="pt-12 pb-6 px-6">
         <h1 className="text-2xl font-bold text-foreground mb-6">Communication Assistant</h1>
         
-        {/* Search Bar */}
         <div className="relative mb-6">
           <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
           <Input
@@ -115,7 +59,6 @@ const CommunicationAssistant = () => {
           />
         </div>
 
-        {/* Category Filter */}
         <div className="flex space-x-3 mb-6 overflow-x-auto pb-2">
           {categories.map((category) => {
             const Icon = category.icon;
@@ -126,9 +69,7 @@ const CommunicationAssistant = () => {
                 size="sm"
                 onClick={() => setSelectedCategory(category.id)}
                 className={`whitespace-nowrap flex items-center space-x-2 rounded-xl ${
-                  selectedCategory === category.id 
-                    ? 'bg-gradient-primary shadow-glow' 
-                    : 'hover:bg-muted'
+                  selectedCategory === category.id ? 'bg-gradient-primary shadow-glow' : 'hover:bg-muted'
                 }`}
               >
                 <Icon className="w-4 h-4" />
@@ -138,44 +79,24 @@ const CommunicationAssistant = () => {
           })}
         </div>
 
-        {/* Phrases List */}
         <div className="space-y-4">
           {filteredPhrases.map((phrase) => (
             <Card key={phrase.id} className="p-6 shadow-card border-0">
               <div className="space-y-4">
-                {/* English */}
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">English</p>
                   <p className="text-foreground font-medium">{phrase.english}</p>
                 </div>
-
-                {/* Hindi Script */}
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">Hindi</p>
                   <p className="text-foreground font-medium text-lg">{phrase.hindi}</p>
                 </div>
-
-                {/* Phonetic */}
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">Pronunciation</p>
                   <p className="text-foreground italic">{phrase.phonetic}</p>
                 </div>
-
-                {/* Actions */}
-                <div className="flex items-center justify-between pt-2">
-                  <Badge variant="secondary" className="capitalize">
-                    {phrase.category}
-                  </Badge>
-                  
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => playAudio(phrase.hindi)}
-                    className="flex items-center space-x-2 hover:bg-primary/10 hover:text-primary hover:border-primary"
-                  >
-                    <Volume2 className="w-4 h-4" />
-                    <span>Play</span>
-                  </Button>
+                <div className="pt-2">
+                  <Badge variant="secondary" className="capitalize">{phrase.category}</Badge>
                 </div>
               </div>
             </Card>
