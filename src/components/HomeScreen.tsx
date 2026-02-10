@@ -1,20 +1,23 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Home, Users, MessageCircle, Search, Calendar, MapPin } from 'lucide-react';
+import { Home, Users, MessageCircle, Calendar, MapPin } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface HomeScreenProps {
   onNavigate: (tab: string) => void;
 }
 
 const HomeScreen = ({ onNavigate }: HomeScreenProps) => {
+  const { user } = useAuth();
+  const displayName = user?.user_metadata?.display_name || user?.email || 'User';
+  const initial = displayName.charAt(0).toUpperCase();
+
   const quickActions = [
     {
       id: 'housing',
       icon: Home,
       title: 'Find Housing',
       description: 'Browse available rentals',
-      color: 'bg-primary text-primary-foreground',
       bgGradient: 'bg-gradient-primary'
     },
     {
@@ -22,29 +25,29 @@ const HomeScreen = ({ onNavigate }: HomeScreenProps) => {
       icon: Users,
       title: 'Join Community',
       description: 'Connect with locals',
-      color: 'bg-success text-success-foreground',
       bgGradient: 'bg-gradient-to-br from-success to-success/80'
     }
   ];
 
   const recentActivity = [
-    { icon: Search, text: 'Searched for 2BHK apartments in Bangalore', time: '2 hours ago' },
-    { icon: Calendar, text: 'RSVP\'d to Diwali celebration event', time: '1 day ago' },
+    { icon: Calendar, text: "RSVP'd to Diwali celebration event", time: '1 day ago' },
     { icon: MessageCircle, text: 'Learned 5 new Hindi phrases', time: '2 days ago' }
   ];
 
   return (
     <div className="min-h-screen bg-gradient-subtle pb-20">
-      {/* Header */}
       <div className="pt-12 pb-6 px-6">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-foreground">Welcome back!</h1>
             <p className="text-muted-foreground">Let's make today productive</p>
           </div>
-          <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center">
-            <span className="text-white font-semibold text-lg">U</span>
-          </div>
+          <button
+            onClick={() => onNavigate('profile')}
+            className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center"
+          >
+            <span className="text-white font-semibold text-lg">{initial}</span>
+          </button>
         </div>
 
         {/* Quick Actions */}
@@ -65,17 +68,10 @@ const HomeScreen = ({ onNavigate }: HomeScreenProps) => {
           ))}
         </div>
 
-        {/* Feature Overview */}
+        {/* Feature Overview - Removed Housing, kept Events and Translate */}
         <Card className="p-6 shadow-card border-0 mb-6">
           <h3 className="text-lg font-semibold text-foreground mb-4">Your NRI Toolkit</h3>
-          <div className="grid grid-cols-3 gap-4">
-            <button 
-              onClick={() => onNavigate('housing')}
-              className="text-center p-3 rounded-xl hover:bg-muted transition-colors"
-            >
-              <MapPin className="w-6 h-6 text-primary mx-auto mb-2" />
-              <span className="text-xs font-medium text-muted-foreground">Housing</span>
-            </button>
+          <div className="grid grid-cols-2 gap-4">
             <button 
               onClick={() => onNavigate('cultural')}
               className="text-center p-3 rounded-xl hover:bg-muted transition-colors"
