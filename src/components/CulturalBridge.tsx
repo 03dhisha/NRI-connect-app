@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -7,14 +7,22 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Switch } from '@/components/ui/switch';
-import { Users, Calendar, MapPin, Plus, Clock, Star, ChefHat, ExternalLink, Copy } from 'lucide-react';
+import { Users, Calendar, MapPin, Plus, Clock, Star, ChefHat, ExternalLink, Send, ArrowLeft, Heart } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
-const CulturalBridge = () => {
+interface CulturalBridgeProps {
+  defaultTab?: string;
+}
+
+const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState('community');
+  const [activeTab, setActiveTab] = useState(defaultTab || 'community');
+
+  useEffect(() => {
+    if (defaultTab) setActiveTab(defaultTab);
+  }, [defaultTab]);
 
   // Community state
   const [groups, setGroups] = useState<any[]>([]);
@@ -23,6 +31,12 @@ const CulturalBridge = () => {
   const [groupName, setGroupName] = useState('');
   const [groupDesc, setGroupDesc] = useState('');
   const [groupCategory, setGroupCategory] = useState('General');
+
+  // Group chat state
+  const [openGroupChat, setOpenGroupChat] = useState<any | null>(null);
+  const [messages, setMessages] = useState<any[]>([]);
+  const [newMessage, setNewMessage] = useState('');
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Events state
   const [events, setEvents] = useState<any[]>([]);
@@ -33,6 +47,7 @@ const CulturalBridge = () => {
   const [eventDate, setEventDate] = useState('');
   const [eventLocation, setEventLocation] = useState('');
   const [eventLink, setEventLink] = useState('');
+  const [interestedEventIds, setInterestedEventIds] = useState<Set<string>>(new Set());
 
   // Food state
   const [restaurants, setRestaurants] = useState<any[]>([]);
@@ -46,7 +61,6 @@ const CulturalBridge = () => {
   const [restDishes, setRestDishes] = useState('');
   const [selectedRestaurant, setSelectedRestaurant] = useState<any | null>(null);
 
-  // Fetch data
   useEffect(() => {
     fetchGroups();
     fetchEvents();
@@ -54,6 +68,7 @@ const CulturalBridge = () => {
     if (user) {
       fetchJoinedGroups();
       fetchUserRestRatings();
+      fetchInterestedEvents();
     }
   }, [user]);
 
@@ -71,6 +86,12 @@ const CulturalBridge = () => {
   const fetchEvents = async () => {
     const { data } = await supabase.from('events').select('*').order('event_date', { ascending: true });
     if (data) setEvents(data);
+  };
+
+  const fetchInterestedEvents = async () => {
+    if (!user) return;
+    const { data } = await supabase.from('event_attendees').select('event_id').eq('user_id', user.id);
+    if (data) setInterestedEventIds(new Set(data.map((d: any) => d.event_id)));
   };
 
   const fetchRestaurants = async () => {
@@ -91,8 +112,13 @@ const CulturalBridge = () => {
   // Community handlers
   const handleCreateGroup = async () => {
     if (!user || !groupName || !groupCategory) { toast.error('Fill required fields'); return; }
-    const { error } = await supabase.from('community_groups').insert({ user_id: user.id, name: groupName, description: groupDesc, category: groupCategory });
+    const { data, error } = await supabase.from('community_groups').insert({ user_id: user.id, name: groupName, description: groupDesc, category: groupCategory }).select().single();
     if (error) { toast.error('Failed to create group'); return; }
+    // Auto-join creator
+    if (data) {
+      await supabase.from('group_members').insert({ group_id: data.id, user_id: user.id });
+      setJoinedGroupIds(prev => new Set(prev).add(data.id));
+    }
     toast.success('Group created!');
     setIsCreateGroupOpen(false);
     setGroupName(''); setGroupDesc(''); setGroupCategory('General');
@@ -110,6 +136,43 @@ const CulturalBridge = () => {
     }
   };
 
+  // Group Chat handlers
+  const openChat = async (group: any) => {
+    setOpenGroupChat(group);
+    await fetchMessages(group.id);
+  };
+
+  const fetchMessages = async (groupId: string) => {
+    const { data } = await supabase.from('group_messages').select('*').eq('group_id', groupId).order('created_at', { ascending: true });
+    if (data) setMessages(data);
+    setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
+  };
+
+  // Realtime subscription for group messages
+  useEffect(() => {
+    if (!openGroupChat) return;
+    const channel = supabase
+      .channel(`group-messages-${openGroupChat.id}`)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'group_messages', filter: `group_id=eq.${openGroupChat.id}` }, (payload) => {
+        setMessages(prev => [...prev, payload.new]);
+        setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [openGroupChat]);
+
+  const handleSendMessage = async () => {
+    if (!user || !openGroupChat || !newMessage.trim()) return;
+    const displayName = user.user_metadata?.display_name || user.email || 'User';
+    await supabase.from('group_messages').insert({
+      group_id: openGroupChat.id,
+      user_id: user.id,
+      display_name: displayName,
+      content: newMessage.trim(),
+    });
+    setNewMessage('');
+  };
+
   // Event handlers
   const handleCreateEvent = async () => {
     if (!user || !eventTitle || !eventDate || !eventLocation) { toast.error('Fill required fields'); return; }
@@ -124,15 +187,26 @@ const CulturalBridge = () => {
     fetchEvents();
   };
 
+  const handleToggleInterested = async (eventId: string) => {
+    if (!user) return;
+    if (interestedEventIds.has(eventId)) {
+      await supabase.from('event_attendees').delete().eq('event_id', eventId).eq('user_id', user.id);
+      setInterestedEventIds(prev => { const n = new Set(prev); n.delete(eventId); return n; });
+    } else {
+      await supabase.from('event_attendees').insert({ event_id: eventId, user_id: user.id });
+      setInterestedEventIds(prev => new Set(prev).add(eventId));
+    }
+  };
+
   const now = new Date();
   const upcomingEvents = events.filter(e => new Date(e.event_date) >= now);
   const pastEvents = events.filter(e => new Date(e.event_date) < now);
 
   // Restaurant handlers
   const handleAddRestaurant = async () => {
-    if (!user || !restName || !restCuisine) { toast.error('Fill required fields'); return; }
+    if (!user || !restName || !restCuisine || !restLocation) { toast.error('Please fill in Name, Cuisine, and Location'); return; }
     const { error } = await supabase.from('restaurants').insert({
-      user_id: user.id, name: restName, cuisine: restCuisine, location: restLocation || null,
+      user_id: user.id, name: restName, cuisine: restCuisine, location: restLocation,
       is_veg: restIsVeg, specialty: restSpecialty || null,
       recommended_dishes: restDishes ? restDishes.split(',').map(d => d.trim()) : [],
     });
@@ -157,6 +231,50 @@ const CulturalBridge = () => {
       fetchRestaurants();
     }
   };
+
+  // Group Chat View
+  if (openGroupChat) {
+    return (
+      <div className="min-h-screen bg-gradient-subtle pb-20 flex flex-col">
+        <div className="pt-12 pb-4 px-6 flex items-center space-x-3 border-b border-border bg-card">
+          <Button variant="ghost" size="sm" onClick={() => setOpenGroupChat(null)}>
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+          <div>
+            <h2 className="font-semibold text-foreground">{openGroupChat.name}</h2>
+            <p className="text-xs text-muted-foreground">{openGroupChat.category}</p>
+          </div>
+        </div>
+        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-3" style={{ maxHeight: 'calc(100vh - 200px)' }}>
+          {messages.length === 0 && <p className="text-center text-muted-foreground py-8">No messages yet. Start the conversation!</p>}
+          {messages.map((msg) => (
+            <div key={msg.id} className={`flex ${msg.user_id === user?.id ? 'justify-end' : 'justify-start'}`}>
+              <div className={`max-w-[75%] px-4 py-2 rounded-2xl ${msg.user_id === user?.id ? 'bg-primary text-primary-foreground' : 'bg-muted text-foreground'}`}>
+                {msg.user_id !== user?.id && (
+                  <p className="text-xs font-medium mb-1 opacity-70">{msg.display_name || 'User'}</p>
+                )}
+                <p className="text-sm">{msg.content}</p>
+                <p className="text-[10px] opacity-50 mt-1">{new Date(msg.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</p>
+              </div>
+            </div>
+          ))}
+          <div ref={messagesEndRef} />
+        </div>
+        <div className="px-6 py-3 border-t border-border bg-card flex space-x-2">
+          <Input
+            value={newMessage}
+            onChange={e => setNewMessage(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && handleSendMessage()}
+            placeholder="Type a message..."
+            className="flex-1 rounded-xl"
+          />
+          <Button size="sm" onClick={handleSendMessage} className="bg-gradient-primary rounded-xl">
+            <Send className="w-4 h-4" />
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-subtle pb-20">
@@ -206,11 +324,18 @@ const CulturalBridge = () => {
                     </div>
                   </div>
                 </div>
-                <Button size="sm" variant={joinedGroupIds.has(group.id) ? "outline" : "default"}
-                  className={joinedGroupIds.has(group.id) ? "" : "bg-gradient-primary hover:shadow-glow"}
-                  onClick={() => handleJoinGroup(group.id)}>
-                  {joinedGroupIds.has(group.id) ? 'Joined' : 'Join Group'}
-                </Button>
+                <div className="flex space-x-2">
+                  <Button size="sm" variant={joinedGroupIds.has(group.id) ? "outline" : "default"}
+                    className={joinedGroupIds.has(group.id) ? "" : "bg-gradient-primary hover:shadow-glow"}
+                    onClick={() => handleJoinGroup(group.id)}>
+                    {joinedGroupIds.has(group.id) ? 'Joined' : 'Join Group'}
+                  </Button>
+                  {joinedGroupIds.has(group.id) && (
+                    <Button size="sm" variant="ghost" className="text-primary" onClick={() => openChat(group)}>
+                      Open Chat
+                    </Button>
+                  )}
+                </div>
               </Card>
             ))}
           </TabsContent>
@@ -238,14 +363,24 @@ const CulturalBridge = () => {
                     <MapPin className="w-4 h-4 mr-2" />{event.location}
                   </div>
                 </div>
-                {event.platform_link && (
-                  <a href={event.platform_link} target="_blank" rel="noopener noreferrer">
-                    <Button size="sm" variant="outline" className="text-primary">
-                      <ExternalLink className="w-3 h-3 mr-1" /> Details
-                    </Button>
-                  </a>
-                )}
-                {!event.platform_link && <Badge variant="secondary">No link provided</Badge>}
+                <div className="flex items-center space-x-2">
+                  <Button
+                    size="sm"
+                    variant={interestedEventIds.has(event.id) ? "default" : "outline"}
+                    className={interestedEventIds.has(event.id) ? "bg-gradient-primary" : ""}
+                    onClick={() => handleToggleInterested(event.id)}
+                  >
+                    <Heart className={`w-3.5 h-3.5 mr-1 ${interestedEventIds.has(event.id) ? 'fill-current' : ''}`} />
+                    {interestedEventIds.has(event.id) ? 'Interested' : 'Mark Interested'}
+                  </Button>
+                  {event.platform_link && (
+                    <a href={event.platform_link} target="_blank" rel="noopener noreferrer">
+                      <Button size="sm" variant="outline" className="text-primary">
+                        <ExternalLink className="w-3 h-3 mr-1" /> Details
+                      </Button>
+                    </a>
+                  )}
+                </div>
               </Card>
             ))}
           </TabsContent>
@@ -261,7 +396,7 @@ const CulturalBridge = () => {
                 <div className="space-y-4 pt-4">
                   <div><Label>Name *</Label><Input value={restName} onChange={e => setRestName(e.target.value)} placeholder="Restaurant name" /></div>
                   <div><Label>Cuisine *</Label><Input value={restCuisine} onChange={e => setRestCuisine(e.target.value)} placeholder="e.g. North Indian" /></div>
-                  <div><Label>Location</Label><Input value={restLocation} onChange={e => setRestLocation(e.target.value)} placeholder="Address" /></div>
+                  <div><Label>Location *</Label><Input value={restLocation} onChange={e => setRestLocation(e.target.value)} placeholder="Address (required)" /></div>
                   <div><Label>Specialty</Label><Input value={restSpecialty} onChange={e => setRestSpecialty(e.target.value)} placeholder="e.g. Biryani" /></div>
                   <div><Label>Recommended Dishes (comma separated)</Label><Input value={restDishes} onChange={e => setRestDishes(e.target.value)} placeholder="Biryani, Kebab" /></div>
                   <div className="flex items-center space-x-3">
@@ -272,7 +407,6 @@ const CulturalBridge = () => {
               </DialogContent>
             </Dialog>
 
-            {/* Restaurant Detail View */}
             {selectedRestaurant && (
               <Dialog open={!!selectedRestaurant} onOpenChange={() => setSelectedRestaurant(null)}>
                 <DialogContent>

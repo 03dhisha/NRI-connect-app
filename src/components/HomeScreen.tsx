@@ -73,7 +73,7 @@ const HomeScreen = ({ onNavigate }: HomeScreenProps) => {
           <h3 className="text-lg font-semibold text-foreground mb-4">Your NRI Toolkit</h3>
           <div className="grid grid-cols-2 gap-4">
             <button 
-              onClick={() => onNavigate('cultural')}
+              onClick={() => onNavigate('cultural-events')}
               className="text-center p-3 rounded-xl hover:bg-muted transition-colors"
             >
               <Calendar className="w-6 h-6 text-success mx-auto mb-2" />

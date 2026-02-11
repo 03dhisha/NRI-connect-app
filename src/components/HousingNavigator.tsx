@@ -122,7 +122,7 @@ const HousingNavigator = () => {
     }
   };
 
-  const filters = ['All', '1BHK', '2BHK', '3BHK', 'Studio'];
+  const filters = ['All', '1BHK', '2BHK', '3BHK'];
 
   const filteredListings = listings.filter(l => {
     const matchesSearch = l.title.toLowerCase().includes(searchQuery.toLowerCase()) || l.location.toLowerCase().includes(searchQuery.toLowerCase());

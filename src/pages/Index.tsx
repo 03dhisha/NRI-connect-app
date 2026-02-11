@@ -13,6 +13,7 @@ const Index = () => {
   const { user, isLoading } = useAuth();
   const [hasSeenOnboarding, setHasSeenOnboarding] = useState(false);
   const [activeTab, setActiveTab] = useState('home');
+  const [culturalDefaultTab, setCulturalDefaultTab] = useState<string | undefined>();
 
   const handleGetStarted = () => {
     setHasSeenOnboarding(true);
@@ -20,7 +21,13 @@ const Index = () => {
   };
 
   const handleNavigate = (tab: string) => {
-    setActiveTab(tab);
+    if (tab === 'cultural-events') {
+      setCulturalDefaultTab('events');
+      setActiveTab('cultural');
+    } else {
+      setCulturalDefaultTab(undefined);
+      setActiveTab(tab);
+    }
   };
 
   const handleLoginSuccess = () => {
@@ -58,7 +65,7 @@ const Index = () => {
       case 'housing':
         return <HousingNavigator />;
       case 'cultural':
-        return <CulturalBridge />;
+        return <CulturalBridge defaultTab={culturalDefaultTab} />;
       case 'communication':
         return <CommunicationAssistant />;
       case 'profile':
