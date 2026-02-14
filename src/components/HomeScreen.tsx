@@ -1,13 +1,14 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
-import { Home, Users, MessageCircle, Calendar, MapPin } from 'lucide-react';
+import { Home, Users, MessageCircle, Calendar, MapPin, Shield } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface HomeScreenProps {
   onNavigate: (tab: string) => void;
+  isAdmin?: boolean;
 }
 
-const HomeScreen = ({ onNavigate }: HomeScreenProps) => {
+const HomeScreen = ({ onNavigate, isAdmin }: HomeScreenProps) => {
   const { user } = useAuth();
   const displayName = user?.user_metadata?.display_name || user?.email || 'User';
   const initial = displayName.charAt(0).toUpperCase();
@@ -88,6 +89,21 @@ const HomeScreen = ({ onNavigate }: HomeScreenProps) => {
             </button>
           </div>
         </Card>
+
+        {/* Admin Access */}
+        {isAdmin && (
+          <Card className="p-4 shadow-card border-0 mb-6 cursor-pointer hover:shadow-floating transition-shadow" onClick={() => onNavigate('admin')}>
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-destructive/10 rounded-xl flex items-center justify-center">
+                <Shield className="w-5 h-5 text-destructive" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-foreground">Admin Dashboard</h3>
+                <p className="text-sm text-muted-foreground">View users, analytics & stats</p>
+              </div>
+            </div>
+          </Card>
+        )}
 
         {/* Recent Activity */}
         <Card className="p-6 shadow-card border-0">

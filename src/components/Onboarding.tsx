@@ -2,6 +2,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Home, Users, MessageCircle } from 'lucide-react';
+import welcomeIllustration from '@/assets/welcome-illustration.png';
 
 interface OnboardingProps {
   onGetStarted: () => void;
@@ -29,30 +30,38 @@ const Onboarding = ({ onGetStarted }: OnboardingProps) => {
   return (
     <div className="min-h-screen bg-gradient-subtle flex flex-col">
       {/* Header */}
-      <div className="pt-16 pb-8 px-6 text-center">
-        <div className="w-20 h-20 bg-gradient-primary rounded-3xl mx-auto mb-6 flex items-center justify-center shadow-glow">
-          <Home className="w-10 h-10 text-white" />
-        </div>
-        <h1 className="text-4xl font-bold text-foreground mb-4">
+      <div className="pt-12 pb-4 px-6 text-center">
+        <h1 className="text-4xl font-bold text-foreground mb-2">
           Welcome to <span className="bg-gradient-primary bg-clip-text text-transparent">NRI Connect</span>
         </h1>
-        <p className="text-xl text-muted-foreground max-w-md mx-auto leading-relaxed">
-          Your companion for seamless living in India. Housing, community, and communication - all in one place.
+        <p className="text-lg text-muted-foreground max-w-md mx-auto leading-relaxed">
+          Your companion for seamless living in India
         </p>
       </div>
 
+      {/* Hero Illustration */}
+      <div className="px-6 mb-4">
+        <div className="rounded-2xl overflow-hidden shadow-card max-w-md mx-auto">
+          <img
+            src={welcomeIllustration}
+            alt="People connecting in a vibrant Indian community"
+            className="w-full h-auto object-cover"
+          />
+        </div>
+      </div>
+
       {/* Features */}
-      <div className="flex-1 px-6 pb-8">
-        <div className="space-y-6 max-w-md mx-auto">
+      <div className="flex-1 px-6 pb-6">
+        <div className="space-y-4 max-w-md mx-auto">
           {features.map((feature, index) => (
-            <Card key={index} className="p-6 shadow-card border-0 bg-card/80 backdrop-blur-sm">
+            <Card key={index} className="p-5 shadow-card border-0 bg-card/80 backdrop-blur-sm">
               <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center flex-shrink-0">
-                  <feature.icon className="w-6 h-6 text-primary" />
+                <div className="w-11 h-11 bg-primary/10 rounded-2xl flex items-center justify-center flex-shrink-0">
+                  <feature.icon className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-card-foreground mb-2">{feature.title}</h3>
-                  <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
+                  <h3 className="text-base font-semibold text-card-foreground mb-1">{feature.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
                 </div>
               </div>
             </Card>
@@ -62,7 +71,7 @@ const Onboarding = ({ onGetStarted }: OnboardingProps) => {
 
       {/* Get Started Button */}
       <div className="p-6">
-        <Button 
+        <Button
           onClick={onGetStarted}
           size="lg"
           className="w-full bg-gradient-primary hover:shadow-glow transition-all duration-300 text-lg py-6 rounded-2xl border-0 hover:scale-105"
