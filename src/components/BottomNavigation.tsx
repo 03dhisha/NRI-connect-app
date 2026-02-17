@@ -26,7 +26,7 @@ const BottomNavigation = ({ activeTab, onTabChange }: BottomNavigationProps) => 
             <button
               key={tab.id}
               onClick={() => onTabChange(tab.id)}
-              className={`flex flex-col items-center py-2 px-3 rounded-xl transition-all duration-300 ${
+              className={`flex flex-col items-center py-2 px-3 rounded-md transition-all duration-300 ${
                 isActive 
                   ? 'text-primary bg-primary/10 shadow-glow' 
                   : 'text-muted-foreground hover:text-foreground'

@@ -175,16 +175,17 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
 
   // Event handlers
   const handleCreateEvent = async () => {
-    if (!user || !eventTitle || !eventDate || !eventLocation) { toast.error('Fill required fields'); return; }
+    if (!user || !eventTitle || !eventDate || !eventLocation || !eventLink) { toast.error('Please fill in all required fields including Platform/Booking Link'); return; }
     const { error } = await supabase.from('events').insert({
       user_id: user.id, title: eventTitle, description: eventDesc,
-      event_date: new Date(eventDate).toISOString(), location: eventLocation, platform_link: eventLink || null,
+      event_date: new Date(eventDate).toISOString(), location: eventLocation, platform_link: eventLink,
     });
     if (error) { toast.error('Failed to create event'); return; }
     toast.success('Event created!');
     setIsCreateEventOpen(false);
     setEventTitle(''); setEventDesc(''); setEventDate(''); setEventLocation(''); setEventLink('');
-    fetchEvents();
+    await fetchEvents();
+    setActiveTab('events');
   };
 
   const handleToggleInterested = async (eventId: string) => {
@@ -214,7 +215,8 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
     toast.success('Restaurant added!');
     setIsAddRestOpen(false);
     setRestName(''); setRestCuisine(''); setRestLocation(''); setRestIsVeg(false); setRestSpecialty(''); setRestDishes('');
-    fetchRestaurants();
+    await fetchRestaurants();
+    setActiveTab('food');
   };
 
   const handleRateRestaurant = async (restaurantId: string, rating: number) => {
@@ -282,10 +284,10 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
         <h1 className="text-2xl font-bold text-foreground mb-6">Cultural Bridge</h1>
         
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-6 bg-muted/50 rounded-2xl p-1">
-            <TabsTrigger value="community" className="rounded-xl">Community</TabsTrigger>
-            <TabsTrigger value="events" className="rounded-xl">Events</TabsTrigger>
-            <TabsTrigger value="food" className="rounded-xl">Food</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3 mb-6 bg-muted/50 rounded-lg p-1">
+            <TabsTrigger value="community" className="rounded-md">Community</TabsTrigger>
+            <TabsTrigger value="events" className="rounded-md">Events</TabsTrigger>
+            <TabsTrigger value="food" className="rounded-md">Food</TabsTrigger>
           </TabsList>
 
           {/* Community Tab */}
@@ -481,7 +483,7 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
               <div><Label>Description</Label><Input value={eventDesc} onChange={e => setEventDesc(e.target.value)} placeholder="Brief description" /></div>
               <div><Label>Date & Time *</Label><Input type="datetime-local" value={eventDate} onChange={e => setEventDate(e.target.value)} /></div>
               <div><Label>Location *</Label><Input value={eventLocation} onChange={e => setEventLocation(e.target.value)} placeholder="Venue or address" /></div>
-              <div><Label>Platform / Booking Link</Label><Input value={eventLink} onChange={e => setEventLink(e.target.value)} placeholder="https://..." /></div>
+              <div><Label>Platform / Booking Link *</Label><Input value={eventLink} onChange={e => setEventLink(e.target.value)} placeholder="https://..." /></div>
               <Button onClick={handleCreateEvent} className="w-full bg-gradient-primary">Create Event</Button>
             </div>
           </DialogContent>

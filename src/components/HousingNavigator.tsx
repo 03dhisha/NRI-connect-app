@@ -163,7 +163,7 @@ const HousingNavigator = () => {
             placeholder="Search by location or title..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-12 h-14 rounded-2xl border-0 shadow-card bg-card"
+            className="pl-12 h-14 rounded-lg border-0 shadow-card bg-card"
           />
         </div>
 
@@ -182,7 +182,7 @@ const HousingNavigator = () => {
             <Badge
               key={filter}
               variant={selectedFilter === filter ? 'default' : 'secondary'}
-              className="whitespace-nowrap px-4 py-2 rounded-xl cursor-pointer"
+              className="whitespace-nowrap px-4 py-2 rounded-md cursor-pointer"
               onClick={() => setSelectedFilter(filter)}
             >
               {filter}

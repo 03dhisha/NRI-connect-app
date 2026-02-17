@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import welcomeIllustration from '@/assets/welcome-illustration.png';
+import nriLogo from '@/assets/nri-logo.png';
 
 interface OnboardingProps {
   onGetStarted: () => void;
@@ -9,9 +10,10 @@ interface OnboardingProps {
 const Onboarding = ({ onGetStarted }: OnboardingProps) => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Header */}
-      <div className="pt-12 pb-2 px-6 text-center">
-        <h1 className="text-4xl font-bold text-foreground tracking-tight">
+      {/* Header with logo */}
+      <div className="pt-10 pb-2 px-6 flex items-center gap-3">
+        <img src={nriLogo} alt="NRI Connect Logo" className="w-12 h-12 object-contain" />
+        <h1 className="text-3xl font-bold text-foreground tracking-tight">
           Welcome to <span className="text-primary">NRI Connect</span>
         </h1>
       </div>
@@ -33,7 +35,7 @@ const Onboarding = ({ onGetStarted }: OnboardingProps) => {
             <Button
               onClick={onGetStarted}
               size="lg"
-              className="bg-primary hover:bg-primary/90 text-primary-foreground px-10 py-6 text-lg rounded-xl shadow-card transition-all duration-300 hover:shadow-floating"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground px-10 py-6 text-lg rounded-lg shadow-card transition-all duration-300 hover:shadow-floating"
             >
               Get Started
             </Button>
@@ -45,7 +47,7 @@ const Onboarding = ({ onGetStarted }: OnboardingProps) => {
           <img
             src={welcomeIllustration}
             alt="Global NRI community illustration"
-            className="w-full max-w-md rounded-2xl shadow-card object-cover"
+            className="w-full max-w-md rounded-lg shadow-card object-cover"
           />
         </div>
       </div>
