@@ -4,8 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
-import { Globe, Mail, Lock, User, ArrowRight, Loader2 } from 'lucide-react';
+import { Mail, Lock, User, ArrowRight, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import nriLogo from '@/assets/nri-logo.png';
 
 interface LoginPageProps {
   onSuccess: () => void;
@@ -48,9 +49,7 @@ const LoginPage = ({ onSuccess }: LoginPageProps) => {
     <div className="min-h-screen bg-gradient-subtle flex flex-col items-center justify-center p-6">
       {/* Logo Section */}
       <div className="text-center mb-8">
-        <div className="w-20 h-20 bg-gradient-primary rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-glow">
-          <Globe className="w-10 h-10 text-white" />
-        </div>
+        <img src={nriLogo} alt="NRI Connect Logo" className="w-20 h-20 object-contain mx-auto mb-4" />
         <h1 className="text-3xl font-bold text-foreground mb-2">NRI Connect</h1>
         <p className="text-muted-foreground">Your gateway to India</p>
       </div>
