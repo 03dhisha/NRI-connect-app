@@ -54,12 +54,12 @@ const HomeScreen = ({ onNavigate, isAdmin }: HomeScreenProps) => {
         {/* Quick Actions */}
         <div className="grid grid-cols-2 gap-4 mb-8">
           {quickActions.map((action) => (
-            <Card key={action.id} className="border-0 overflow-hidden shadow-card">
+            <Card key={action.id} className="border-0 overflow-hidden shadow-card rounded-lg">
               <button 
                 onClick={() => onNavigate(action.id)}
                 className="w-full p-6 text-left hover:scale-105 transition-all duration-300"
               >
-                <div className={`w-12 h-12 ${action.bgGradient} rounded-2xl flex items-center justify-center mb-4`}>
+                <div className={`w-12 h-12 ${action.bgGradient} rounded-md flex items-center justify-center mb-4`}>
                   <action.icon className="w-6 h-6 text-white" />
                 </div>
                 <h3 className="font-semibold text-foreground mb-2">{action.title}</h3>
@@ -75,14 +75,14 @@ const HomeScreen = ({ onNavigate, isAdmin }: HomeScreenProps) => {
           <div className="grid grid-cols-2 gap-4">
             <button 
               onClick={() => onNavigate('cultural-events')}
-              className="text-center p-3 rounded-xl hover:bg-muted transition-colors"
+              className="text-center p-3 rounded-md hover:bg-muted transition-colors"
             >
               <Calendar className="w-6 h-6 text-success mx-auto mb-2" />
               <span className="text-xs font-medium text-muted-foreground">Events</span>
             </button>
             <button 
               onClick={() => onNavigate('communication')}
-              className="text-center p-3 rounded-xl hover:bg-muted transition-colors"
+              className="text-center p-3 rounded-md hover:bg-muted transition-colors"
             >
               <MessageCircle className="w-6 h-6 text-accent mx-auto mb-2" />
               <span className="text-xs font-medium text-muted-foreground">Translate</span>
@@ -94,7 +94,7 @@ const HomeScreen = ({ onNavigate, isAdmin }: HomeScreenProps) => {
         {isAdmin && (
           <Card className="p-4 shadow-card border-0 mb-6 cursor-pointer hover:shadow-floating transition-shadow" onClick={() => onNavigate('admin')}>
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-destructive/10 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-destructive/10 rounded-md flex items-center justify-center">
                 <Shield className="w-5 h-5 text-destructive" />
               </div>
               <div>

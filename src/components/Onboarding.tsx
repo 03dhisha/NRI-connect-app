@@ -12,7 +12,7 @@ const Onboarding = ({ onGetStarted }: OnboardingProps) => {
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header with logo */}
       <div className="pt-10 pb-2 px-6 flex items-center gap-3">
-        <img src={nriLogo} alt="NRI Connect Logo" className="w-12 h-12 object-contain" />
+        <img src={nriLogo} alt="NRI Connect Logo" className="w-16 h-16 object-contain" />
         <h1 className="text-3xl font-bold text-foreground tracking-tight">
           Welcome to <span className="text-primary">NRI Connect</span>
         </h1>
@@ -47,7 +47,7 @@ const Onboarding = ({ onGetStarted }: OnboardingProps) => {
           <img
             src={welcomeIllustration}
             alt="Global NRI community illustration"
-            className="w-full max-w-md rounded-lg shadow-card object-cover"
+            className="w-full max-w-md rounded-lg object-cover"
           />
         </div>
       </div>
