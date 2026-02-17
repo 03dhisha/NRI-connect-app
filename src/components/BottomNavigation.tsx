@@ -28,7 +28,7 @@ const BottomNavigation = ({ activeTab, onTabChange }: BottomNavigationProps) => 
               onClick={() => onTabChange(tab.id)}
               className={`flex flex-col items-center py-2 px-3 rounded-md transition-all duration-300 ${
                 isActive 
-                  ? 'text-primary bg-primary/10 shadow-glow' 
+                  ? 'text-primary bg-primary/10' 
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
