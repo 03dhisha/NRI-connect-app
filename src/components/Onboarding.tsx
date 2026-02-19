@@ -12,7 +12,7 @@ const Onboarding = ({ onGetStarted }: OnboardingProps) => {
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header with logo */}
       <div className="pt-10 pb-2 px-6 flex items-center gap-3">
-        <img src={nriLogo} alt="NRI Connect Logo" className="w-16 h-16 object-contain" />
+        <img src={nriLogo} alt="NRI Connect Logo" className="w-24 h-24 object-contain" />
         <h1 className="text-3xl font-bold text-foreground tracking-tight">
           Welcome to <span className="text-primary">NRI Connect</span>
         </h1>
