@@ -14,6 +14,7 @@ import { useTheme } from 'next-themes';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import PageHeader from '@/components/PageHeader';
 
 interface ProfileSettingsProps {
   onLogout: () => void;
@@ -263,7 +264,7 @@ const ProfileSettings = ({ onLogout }: ProfileSettingsProps) => {
   return (
     <div className="min-h-screen bg-gradient-subtle pb-20">
       <div className="pt-12 pb-6 px-6">
-        <h1 className="text-2xl font-bold text-foreground mb-8">Profile & Settings</h1>
+        <PageHeader title="Profile & Settings" className="mb-8" />
         
         {/* User Profile Section */}
         <Card className="p-6 shadow-card border-0 mb-6">

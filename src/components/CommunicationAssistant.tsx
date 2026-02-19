@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Search, Plane, Utensils, AlertTriangle, Coffee } from 'lucide-react';
+import PageHeader from '@/components/PageHeader';
 
 interface Phrase {
   id: string;
@@ -47,7 +48,7 @@ const CommunicationAssistant = () => {
   return (
     <div className="min-h-screen bg-gradient-subtle pb-20">
       <div className="pt-12 pb-6 px-6">
-        <h1 className="text-2xl font-bold text-foreground mb-6">Communication Assistant</h1>
+        <PageHeader title="Communication Assistant" className="mb-6" />
         
         <div className="relative mb-6">
           <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />

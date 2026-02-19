@@ -11,6 +11,7 @@ import { Users, Calendar, MapPin, Plus, Clock, Star, ChefHat, ExternalLink, Send
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import PageHeader from '@/components/PageHeader';
 
 interface CulturalBridgeProps {
   defaultTab?: string;
@@ -281,7 +282,7 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
   return (
     <div className="min-h-screen bg-gradient-subtle pb-20">
       <div className="pt-12 pb-6 px-6">
-        <h1 className="text-2xl font-bold text-foreground mb-6">Cultural Bridge</h1>
+        <PageHeader title="Cultural Bridge" className="mb-6" />
         
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-3 mb-6 bg-muted/50 rounded-lg p-1">
