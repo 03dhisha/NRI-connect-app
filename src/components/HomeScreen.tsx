@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Home, Users, MessageCircle, Calendar, MapPin, Shield } from 'lucide-react';
+import nriLogo from '@/assets/nri-logo.png';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface HomeScreenProps {
@@ -39,9 +40,12 @@ const HomeScreen = ({ onNavigate, isAdmin }: HomeScreenProps) => {
     <div className="min-h-screen bg-gradient-subtle pb-20">
       <div className="pt-12 pb-6 px-6">
         <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Welcome back!</h1>
-            <p className="text-muted-foreground">Let's make today productive</p>
+          <div className="flex items-center gap-3">
+            <img src={nriLogo} alt="NRI Connect" className="w-10 h-10 object-contain" />
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">Welcome back!</h1>
+              <p className="text-muted-foreground">Let's make today productive</p>
+            </div>
           </div>
           <button
             onClick={() => onNavigate('profile')}

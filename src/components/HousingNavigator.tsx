@@ -12,6 +12,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import HousingMap from '@/components/housing/HousingMap';
 import LocationPicker from '@/components/housing/LocationPicker';
+import PageHeader from '@/components/PageHeader';
 
 interface HousingListing {
   id: string;
@@ -155,7 +156,7 @@ const HousingNavigator = () => {
   return (
     <div className="min-h-screen bg-gradient-subtle pb-20">
       <div className="pt-12 pb-6 px-6">
-        <h1 className="text-2xl font-bold text-foreground mb-6">Housing Navigator</h1>
+        <PageHeader title="Housing Navigator" className="mb-6" />
 
         <div className="relative mb-6">
           <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
