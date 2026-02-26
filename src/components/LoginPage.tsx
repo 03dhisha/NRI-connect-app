@@ -49,7 +49,7 @@ const LoginPage = ({ onSuccess }: LoginPageProps) => {
     <div className="min-h-screen bg-gradient-subtle flex flex-col items-center justify-center p-6">
       {/* Logo + Title branding block */}
       <div className="text-center mb-6 flex flex-col items-center gap-1">
-        <img src={nriLogo} alt="NRI Connect Logo" className="w-44 h-44 object-contain" />
+        <img src={nriLogo} alt="NRI Connect Logo" className="w-52 h-52 object-contain" />
         <h1 className="text-3xl font-bold text-foreground">NRI Connect</h1>
         <p className="text-muted-foreground">Your gateway to India</p>
       </div>
