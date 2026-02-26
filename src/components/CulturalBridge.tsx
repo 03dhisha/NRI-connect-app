@@ -7,7 +7,8 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Switch } from '@/components/ui/switch';
-import { Users, Calendar, MapPin, Plus, Clock, Star, ChefHat, ExternalLink, Send, ArrowLeft, Heart } from 'lucide-react';
+import { Users, Calendar, MapPin, Plus, Clock, Star, ChefHat, ExternalLink, Send, ArrowLeft, Heart, User } from 'lucide-react';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -32,6 +33,11 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
   const [groupName, setGroupName] = useState('');
   const [groupDesc, setGroupDesc] = useState('');
   const [groupCategory, setGroupCategory] = useState('General');
+
+  // Group members state
+  const [viewingMembersGroup, setViewingMembersGroup] = useState<any | null>(null);
+  const [groupMembers, setGroupMembers] = useState<any[]>([]);
+  const [loadingMembers, setLoadingMembers] = useState(false);
 
   // Group chat state
   const [openGroupChat, setOpenGroupChat] = useState<any | null>(null);
@@ -82,6 +88,41 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
     if (!user) return;
     const { data } = await supabase.from('group_members').select('group_id').eq('user_id', user.id);
     if (data) setJoinedGroupIds(new Set(data.map((d: any) => d.group_id)));
+  };
+
+  const fetchGroupMembers = async (groupId: string) => {
+    setLoadingMembers(true);
+    const { data } = await supabase
+      .from('group_members')
+      .select('user_id, joined_at')
+      .eq('group_id', groupId)
+      .order('joined_at', { ascending: true });
+    if (data) {
+      // Fetch profiles for these users
+      const userIds = data.map((m: any) => m.user_id);
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('user_id, display_name, avatar_url')
+        .in('user_id', userIds);
+      // Check which users are admins (group creators)
+      const group = groups.find(g => g.id === groupId);
+      const membersWithProfiles = data.map((m: any) => {
+        const profile = profiles?.find((p: any) => p.user_id === m.user_id);
+        return {
+          ...m,
+          display_name: profile?.display_name || 'User',
+          avatar_url: profile?.avatar_url || null,
+          is_creator: group?.user_id === m.user_id,
+        };
+      });
+      setGroupMembers(membersWithProfiles);
+    }
+    setLoadingMembers(false);
+  };
+
+  const openMembers = async (group: any) => {
+    setViewingMembersGroup(group);
+    await fetchGroupMembers(group.id);
   };
 
   const fetchEvents = async () => {
@@ -235,6 +276,51 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
     }
   };
 
+  // Group Members View
+  if (viewingMembersGroup) {
+    return (
+      <div className="min-h-screen bg-gradient-subtle pb-20">
+        <div className="pt-12 pb-4 px-6 flex items-center space-x-3 border-b border-border bg-card">
+          <Button variant="ghost" size="sm" onClick={() => setViewingMembersGroup(null)}>
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+          <div>
+            <h2 className="font-semibold text-foreground">{viewingMembersGroup.name}</h2>
+            <p className="text-xs text-muted-foreground">Members</p>
+          </div>
+        </div>
+        <div className="px-6 py-4 space-y-3">
+          {loadingMembers && <p className="text-center text-muted-foreground py-8">Loading members...</p>}
+          {!loadingMembers && groupMembers.length === 0 && (
+            <p className="text-center text-muted-foreground py-8">No members yet.</p>
+          )}
+          {groupMembers.map((member) => (
+            <Card key={member.user_id} className="p-4 shadow-card border-0">
+              <div className="flex items-center space-x-3">
+                <Avatar className="w-10 h-10">
+                  <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                    {member.display_name?.charAt(0)?.toUpperCase() || 'U'}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <p className="font-medium text-foreground">{member.display_name}</p>
+                    {member.is_creator && (
+                      <Badge variant="default" className="text-[10px] px-1.5 py-0">Admin</Badge>
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Joined {new Date(member.joined_at).toLocaleDateString('en-US', { dateStyle: 'medium' })}
+                  </p>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   // Group Chat View
   if (openGroupChat) {
     return (
@@ -334,9 +420,14 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
                     {joinedGroupIds.has(group.id) ? 'Joined' : 'Join Group'}
                   </Button>
                   {joinedGroupIds.has(group.id) && (
-                    <Button size="sm" variant="ghost" className="text-primary" onClick={() => openChat(group)}>
-                      Open Chat
-                    </Button>
+                    <>
+                      <Button size="sm" variant="ghost" className="text-primary" onClick={() => openChat(group)}>
+                        Open Chat
+                      </Button>
+                      <Button size="sm" variant="ghost" className="text-muted-foreground" onClick={() => openMembers(group)}>
+                        <User className="w-4 h-4 mr-1" />Members
+                      </Button>
+                    </>
                   )}
                 </div>
               </Card>

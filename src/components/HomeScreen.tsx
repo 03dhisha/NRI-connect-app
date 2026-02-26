@@ -41,7 +41,7 @@ const HomeScreen = ({ onNavigate, isAdmin }: HomeScreenProps) => {
       <div className="pt-12 pb-6 px-6">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <img src={nriLogo} alt="NRI Connect" className="w-10 h-10 object-contain" />
+            <img src={nriLogo} alt="NRI Connect" className="w-16 h-16 object-contain" />
             <div>
               <h1 className="text-2xl font-bold text-foreground">Welcome back!</h1>
               <p className="text-muted-foreground">Let's make today productive</p>
