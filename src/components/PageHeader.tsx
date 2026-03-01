@@ -9,7 +9,7 @@ interface PageHeaderProps {
 const PageHeader = ({ title, className = '' }: PageHeaderProps) => {
   return (
     <div className={`flex items-center gap-3 ${className}`}>
-      <img src={nriLogo} alt="NRI Connect" className="w-16 h-16 object-contain" />
+      <img src={nriLogo} alt="NRI Connect" className="w-12 h-12 object-contain" />
       <h1 className="text-2xl font-bold text-foreground">{title}</h1>
     </div>
   );
