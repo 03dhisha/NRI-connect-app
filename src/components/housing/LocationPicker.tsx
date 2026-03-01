@@ -39,11 +39,11 @@ const LocationPicker = ({ latitude, longitude, onLocationChange }: LocationPicke
   const defaultLng = longitude || 77.5946;
 
   return (
-    <div className="w-full h-48 rounded-xl overflow-hidden border border-border">
+    <div className="w-full h-48 rounded-xl overflow-hidden border border-border relative" style={{ zIndex: 0 }}>
       <MapContainer
         center={[defaultLat, defaultLng]}
         zoom={13}
-        style={{ width: '100%', height: '100%' }}
+        style={{ width: '100%', height: '100%', zIndex: 0 }}
         attributionControl={false}
       >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />

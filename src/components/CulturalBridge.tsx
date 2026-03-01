@@ -245,6 +245,20 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
   const upcomingEvents = events.filter(e => new Date(e.event_date) >= now);
   const pastEvents = events.filter(e => new Date(e.event_date) < now);
 
+  // Dynamic member count component
+  const MemberCount = ({ groupId }: { groupId: string }) => {
+    const [count, setCount] = useState<number | null>(null);
+    useEffect(() => {
+      supabase.from('group_members').select('id', { count: 'exact', head: true }).eq('group_id', groupId)
+        .then(({ count: c }) => setCount(c ?? 0));
+    }, [groupId, joinedGroupIds]);
+    return (
+      <div className="flex items-center text-sm text-muted-foreground">
+        <Users className="w-4 h-4 mr-1" />{count ?? '...'} members
+      </div>
+    );
+  };
+
   // Restaurant handlers
   const handleAddRestaurant = async () => {
     if (!user || !restName || !restCuisine || !restLocation) { toast.error('Please fill in Name, Cuisine, and Location'); return; }
@@ -408,9 +422,7 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
                       <Badge variant="secondary" className="text-xs">{group.category}</Badge>
                     </div>
                     <p className="text-sm text-muted-foreground mb-3">{group.description}</p>
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <Users className="w-4 h-4 mr-1" />{group.members_count?.toLocaleString() || 1} members
-                    </div>
+                    <MemberCount groupId={group.id} />
                   </div>
                 </div>
                 <div className="flex space-x-2">
