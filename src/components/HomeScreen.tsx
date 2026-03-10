@@ -48,12 +48,15 @@ const HomeScreen = ({ onNavigate, isAdmin }: HomeScreenProps) => {
               <p className="text-muted-foreground">Let's make today productive</p>
             </div>
           </div>
-          <button
-            onClick={() => onNavigate('profile')}
-            className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center"
-          >
-            <span className="text-white font-semibold text-lg">{initial}</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <NotificationBell />
+            <button
+              onClick={() => onNavigate('profile')}
+              className="w-10 h-10 bg-gradient-primary rounded-full flex items-center justify-center"
+            >
+              <span className="text-white font-semibold text-sm">{initial}</span>
+            </button>
+          </div>
         </div>
 
         {/* Quick Actions */}
