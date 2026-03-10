@@ -19,6 +19,7 @@ const Index = () => {
   const [culturalDefaultTab, setCulturalDefaultTab] = useState<string | undefined>();
   const [isAdmin, setIsAdmin] = useState(false);
   const [showAdminDash, setShowAdminDash] = useState(false);
+  const [showFavorites, setShowFavorites] = useState(false);
 
   useEffect(() => {
     if (user) {
