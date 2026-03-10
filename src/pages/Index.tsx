@@ -8,6 +8,7 @@ import ProfileSettings from '@/components/ProfileSettings';
 import BottomNavigation from '@/components/BottomNavigation';
 import LoginPage from '@/components/LoginPage';
 import AdminDashboard from '@/components/AdminDashboard';
+import FavoritesPage from '@/components/FavoritesPage';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 
