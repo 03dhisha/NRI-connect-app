@@ -42,6 +42,7 @@ const HousingNavigator = () => {
   const [userRatings, setUserRatings] = useState<Record<string, number>>({});
   const [selectedListingId, setSelectedListingId] = useState<string | null>(null);
   const listingRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const { toggleFavorite, isFavorite } = useFavorites('housing');
 
   // Form state
   const [newTitle, setNewTitle] = useState('');
