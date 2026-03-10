@@ -251,16 +251,21 @@ const HousingNavigator = () => {
                   )}
                 </div>
                 <div className="flex-1 p-4">
-                  <div className="flex justify-between items-start mb-2">
+                    <div className="flex justify-between items-start mb-2">
                     <div>
                       <h3 className="font-semibold text-foreground">{listing.title}</h3>
                       <p className="text-sm text-muted-foreground flex items-center">
                         <MapPin className="w-3 h-3 mr-1" />{listing.location}
                       </p>
                     </div>
-                    <div className="text-right">
-                      <p className="text-lg font-bold text-primary">₹{listing.rent_amount.toLocaleString()}</p>
-                      <p className="text-xs text-muted-foreground">/month</p>
+                    <div className="flex items-center gap-2">
+                      <button onClick={(e) => { e.stopPropagation(); toggleFavorite(listing.id); }} className="p-1">
+                        <Heart className={`w-4 h-4 ${isFavorite(listing.id) ? 'text-destructive fill-current' : 'text-muted-foreground'}`} />
+                      </button>
+                      <div className="text-right">
+                        <p className="text-lg font-bold text-primary">₹{listing.rent_amount.toLocaleString()}</p>
+                        <p className="text-xs text-muted-foreground">/month</p>
+                      </div>
                     </div>
                   </div>
 
