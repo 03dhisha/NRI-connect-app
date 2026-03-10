@@ -8,6 +8,7 @@ import ProfileSettings from '@/components/ProfileSettings';
 import BottomNavigation from '@/components/BottomNavigation';
 import LoginPage from '@/components/LoginPage';
 import AdminDashboard from '@/components/AdminDashboard';
+import FavoritesPage from '@/components/FavoritesPage';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -18,6 +19,7 @@ const Index = () => {
   const [culturalDefaultTab, setCulturalDefaultTab] = useState<string | undefined>();
   const [isAdmin, setIsAdmin] = useState(false);
   const [showAdminDash, setShowAdminDash] = useState(false);
+  const [showFavorites, setShowFavorites] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -38,11 +40,19 @@ const Index = () => {
     if (tab === 'cultural-events') {
       setCulturalDefaultTab('events');
       setActiveTab('cultural');
+      setShowAdminDash(false);
+      setShowFavorites(false);
     } else if (tab === 'admin') {
       setShowAdminDash(true);
+      setShowFavorites(false);
+    } else if (tab === 'favorites') {
+      setShowFavorites(true);
+      setShowAdminDash(false);
     } else {
       setCulturalDefaultTab(undefined);
       setActiveTab(tab);
+      setShowAdminDash(false);
+      setShowFavorites(false);
     }
   };
 
@@ -76,6 +86,15 @@ const Index = () => {
       <>
         <AdminDashboard onBack={() => setShowAdminDash(false)} />
         <BottomNavigation activeTab={activeTab} onTabChange={(tab) => { setShowAdminDash(false); setActiveTab(tab); }} />
+      </>
+    );
+  }
+
+  if (showFavorites) {
+    return (
+      <>
+        <FavoritesPage onBack={() => { setShowFavorites(false); setActiveTab('home'); }} />
+        <BottomNavigation activeTab={activeTab} onTabChange={(tab) => { setShowFavorites(false); setActiveTab(tab); }} />
       </>
     );
   }

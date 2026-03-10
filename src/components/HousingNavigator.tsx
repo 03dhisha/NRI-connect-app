@@ -6,7 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Search, MapPin, Star, Home, Plus, Copy, Check } from 'lucide-react';
+import { Search, MapPin, Star, Home, Plus, Copy, Check, Heart } from 'lucide-react';
+import { useFavorites } from '@/hooks/useFavorites';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -41,6 +42,7 @@ const HousingNavigator = () => {
   const [userRatings, setUserRatings] = useState<Record<string, number>>({});
   const [selectedListingId, setSelectedListingId] = useState<string | null>(null);
   const listingRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const { toggleFavorite, isFavorite } = useFavorites('housing');
 
   // Form state
   const [newTitle, setNewTitle] = useState('');
@@ -249,16 +251,21 @@ const HousingNavigator = () => {
                   )}
                 </div>
                 <div className="flex-1 p-4">
-                  <div className="flex justify-between items-start mb-2">
+                    <div className="flex justify-between items-start mb-2">
                     <div>
                       <h3 className="font-semibold text-foreground">{listing.title}</h3>
                       <p className="text-sm text-muted-foreground flex items-center">
                         <MapPin className="w-3 h-3 mr-1" />{listing.location}
                       </p>
                     </div>
-                    <div className="text-right">
-                      <p className="text-lg font-bold text-primary">₹{listing.rent_amount.toLocaleString()}</p>
-                      <p className="text-xs text-muted-foreground">/month</p>
+                    <div className="flex items-center gap-2">
+                      <button onClick={(e) => { e.stopPropagation(); toggleFavorite(listing.id); }} className="p-1">
+                        <Heart className={`w-4 h-4 ${isFavorite(listing.id) ? 'text-destructive fill-current' : 'text-muted-foreground'}`} />
+                      </button>
+                      <div className="text-right">
+                        <p className="text-lg font-bold text-primary">₹{listing.rent_amount.toLocaleString()}</p>
+                        <p className="text-xs text-muted-foreground">/month</p>
+                      </div>
                     </div>
                   </div>
 

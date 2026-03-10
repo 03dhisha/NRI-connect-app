@@ -1,8 +1,9 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
-import { Home, Users, MessageCircle, Calendar, MapPin, Shield } from 'lucide-react';
+import { Home, Users, MessageCircle, Calendar, MapPin, Shield, Heart } from 'lucide-react';
 import nriLogo from '@/assets/nri-logo.png';
 import { useAuth } from '@/contexts/AuthContext';
+import NotificationBell from '@/components/NotificationBell';
 
 interface HomeScreenProps {
   onNavigate: (tab: string) => void;
@@ -47,12 +48,15 @@ const HomeScreen = ({ onNavigate, isAdmin }: HomeScreenProps) => {
               <p className="text-muted-foreground">Let's make today productive</p>
             </div>
           </div>
-          <button
-            onClick={() => onNavigate('profile')}
-            className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center"
-          >
-            <span className="text-white font-semibold text-lg">{initial}</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <NotificationBell />
+            <button
+              onClick={() => onNavigate('profile')}
+              className="w-10 h-10 bg-gradient-primary rounded-full flex items-center justify-center"
+            >
+              <span className="text-white font-semibold text-sm">{initial}</span>
+            </button>
+          </div>
         </div>
 
         {/* Quick Actions */}
@@ -76,13 +80,20 @@ const HomeScreen = ({ onNavigate, isAdmin }: HomeScreenProps) => {
         {/* Feature Overview - Removed Housing, kept Events and Translate */}
         <Card className="p-6 shadow-card border-0 mb-6">
           <h3 className="text-lg font-semibold text-foreground mb-4">Your NRI Toolkit</h3>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <button 
               onClick={() => onNavigate('cultural-events')}
               className="text-center p-3 rounded-md hover:bg-muted transition-colors"
             >
               <Calendar className="w-6 h-6 text-success mx-auto mb-2" />
               <span className="text-xs font-medium text-muted-foreground">Events</span>
+            </button>
+            <button 
+              onClick={() => onNavigate('favorites')}
+              className="text-center p-3 rounded-md hover:bg-muted transition-colors"
+            >
+              <Heart className="w-6 h-6 text-destructive mx-auto mb-2" />
+              <span className="text-xs font-medium text-muted-foreground">Favorites</span>
             </button>
             <button 
               onClick={() => onNavigate('communication')}

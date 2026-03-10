@@ -13,6 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import PageHeader from '@/components/PageHeader';
+import { useFavorites } from '@/hooks/useFavorites';
 
 interface CulturalBridgeProps {
   defaultTab?: string;
@@ -21,6 +22,8 @@ interface CulturalBridgeProps {
 const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState(defaultTab || 'community');
+  const restFavorites = useFavorites('restaurant');
+  const eventFavorites = useFavorites('event');
 
   useEffect(() => {
     if (defaultTab) setActiveTab(defaultTab);
@@ -458,7 +461,12 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
 
             {(eventsTab === 'upcoming' ? upcomingEvents : pastEvents).map((event) => (
               <Card key={event.id} className="p-6 shadow-card border-0">
-                <h3 className="font-semibold text-foreground mb-2">{event.title}</h3>
+                <div className="flex justify-between items-start mb-2">
+                  <h3 className="font-semibold text-foreground">{event.title}</h3>
+                  <button onClick={() => eventFavorites.toggleFavorite(event.id)} className="p-1">
+                    <Heart className={`w-4 h-4 ${eventFavorites.isFavorite(event.id) ? 'text-destructive fill-current' : 'text-muted-foreground'}`} />
+                  </button>
+                </div>
                 {event.description && <p className="text-sm text-muted-foreground mb-3">{event.description}</p>}
                 <div className="space-y-2 mb-4">
                   <div className="flex items-center text-sm text-muted-foreground">
@@ -547,8 +555,11 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
                     </div>
                     <p className="text-sm text-muted-foreground">{restaurant.cuisine} • {restaurant.specialty}</p>
                   </div>
-                  <div className="text-right">
-                    <div className="flex items-center mb-1">
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => restFavorites.toggleFavorite(restaurant.id)} className="p-1">
+                      <Heart className={`w-4 h-4 ${restFavorites.isFavorite(restaurant.id) ? 'text-destructive fill-current' : 'text-muted-foreground'}`} />
+                    </button>
+                    <div className="flex items-center">
                       <Star className="w-4 h-4 text-warning fill-current mr-1" />
                       <span className="text-sm font-medium">{Number(restaurant.average_rating).toFixed(1)}</span>
                     </div>
