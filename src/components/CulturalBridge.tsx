@@ -550,8 +550,11 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
                     </div>
                     <p className="text-sm text-muted-foreground">{restaurant.cuisine} • {restaurant.specialty}</p>
                   </div>
-                  <div className="text-right">
-                    <div className="flex items-center mb-1">
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => restFavorites.toggleFavorite(restaurant.id)} className="p-1">
+                      <Heart className={`w-4 h-4 ${restFavorites.isFavorite(restaurant.id) ? 'text-destructive fill-current' : 'text-muted-foreground'}`} />
+                    </button>
+                    <div className="flex items-center">
                       <Star className="w-4 h-4 text-warning fill-current mr-1" />
                       <span className="text-sm font-medium">{Number(restaurant.average_rating).toFixed(1)}</span>
                     </div>
