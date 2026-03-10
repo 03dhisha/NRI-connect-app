@@ -80,13 +80,20 @@ const HomeScreen = ({ onNavigate, isAdmin }: HomeScreenProps) => {
         {/* Feature Overview - Removed Housing, kept Events and Translate */}
         <Card className="p-6 shadow-card border-0 mb-6">
           <h3 className="text-lg font-semibold text-foreground mb-4">Your NRI Toolkit</h3>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <button 
               onClick={() => onNavigate('cultural-events')}
               className="text-center p-3 rounded-md hover:bg-muted transition-colors"
             >
               <Calendar className="w-6 h-6 text-success mx-auto mb-2" />
               <span className="text-xs font-medium text-muted-foreground">Events</span>
+            </button>
+            <button 
+              onClick={() => onNavigate('favorites')}
+              className="text-center p-3 rounded-md hover:bg-muted transition-colors"
+            >
+              <Heart className="w-6 h-6 text-destructive mx-auto mb-2" />
+              <span className="text-xs font-medium text-muted-foreground">Favorites</span>
             </button>
             <button 
               onClick={() => onNavigate('communication')}
