@@ -90,6 +90,15 @@ const Index = () => {
     );
   }
 
+  if (showFavorites) {
+    return (
+      <>
+        <FavoritesPage onBack={() => { setShowFavorites(false); setActiveTab('home'); }} />
+        <BottomNavigation activeTab={activeTab} onTabChange={(tab) => { setShowFavorites(false); setActiveTab(tab); }} />
+      </>
+    );
+  }
+
   const renderActiveScreen = () => {
     switch (activeTab) {
       case 'home':
