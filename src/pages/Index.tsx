@@ -40,11 +40,19 @@ const Index = () => {
     if (tab === 'cultural-events') {
       setCulturalDefaultTab('events');
       setActiveTab('cultural');
+      setShowAdminDash(false);
+      setShowFavorites(false);
     } else if (tab === 'admin') {
       setShowAdminDash(true);
+      setShowFavorites(false);
+    } else if (tab === 'favorites') {
+      setShowFavorites(true);
+      setShowAdminDash(false);
     } else {
       setCulturalDefaultTab(undefined);
       setActiveTab(tab);
+      setShowAdminDash(false);
+      setShowFavorites(false);
     }
   };
 

@@ -461,7 +461,12 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
 
             {(eventsTab === 'upcoming' ? upcomingEvents : pastEvents).map((event) => (
               <Card key={event.id} className="p-6 shadow-card border-0">
-                <h3 className="font-semibold text-foreground mb-2">{event.title}</h3>
+                <div className="flex justify-between items-start mb-2">
+                  <h3 className="font-semibold text-foreground">{event.title}</h3>
+                  <button onClick={() => eventFavorites.toggleFavorite(event.id)} className="p-1">
+                    <Heart className={`w-4 h-4 ${eventFavorites.isFavorite(event.id) ? 'text-destructive fill-current' : 'text-muted-foreground'}`} />
+                  </button>
+                </div>
                 {event.description && <p className="text-sm text-muted-foreground mb-3">{event.description}</p>}
                 <div className="space-y-2 mb-4">
                   <div className="flex items-center text-sm text-muted-foreground">
