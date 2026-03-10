@@ -1,8 +1,9 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
-import { Home, Users, MessageCircle, Calendar, MapPin, Shield } from 'lucide-react';
+import { Home, Users, MessageCircle, Calendar, MapPin, Shield, Heart } from 'lucide-react';
 import nriLogo from '@/assets/nri-logo.png';
 import { useAuth } from '@/contexts/AuthContext';
+import NotificationBell from '@/components/NotificationBell';
 
 interface HomeScreenProps {
   onNavigate: (tab: string) => void;
