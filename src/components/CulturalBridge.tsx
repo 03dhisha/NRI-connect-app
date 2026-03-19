@@ -180,6 +180,8 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
     } else {
       await supabase.from('group_members').insert({ group_id: groupId, user_id: user.id });
       setJoinedGroupIds(prev => new Set(prev).add(groupId));
+      const group = groups.find(g => g.id === groupId);
+      logActivity('community_join', `Joined community: ${group?.name || 'Unknown'}`);
     }
   };
 
