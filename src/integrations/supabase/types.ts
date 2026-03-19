@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity_logs: {
+        Row: {
+          action_text: string
+          action_type: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          action_text: string
+          action_type: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          action_text?: string
+          action_type?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       community_groups: {
         Row: {
           category: string
