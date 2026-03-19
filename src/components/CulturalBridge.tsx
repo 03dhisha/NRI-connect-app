@@ -22,6 +22,7 @@ interface CulturalBridgeProps {
 
 const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
   const { user } = useAuth();
+  const { logActivity } = useActivityLog();
   const [activeTab, setActiveTab] = useState(defaultTab || 'community');
   const restFavorites = useFavorites('restaurant');
   const eventFavorites = useFavorites('event');
