@@ -243,6 +243,8 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
     } else {
       await supabase.from('event_attendees').insert({ event_id: eventId, user_id: user.id });
       setInterestedEventIds(prev => new Set(prev).add(eventId));
+      const event = events.find(e => e.id === eventId);
+      logActivity('event_interest', `Marked interest in event: ${event?.title || 'Unknown'}`);
     }
   };
 
