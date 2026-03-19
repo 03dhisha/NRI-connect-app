@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { 
-  User, Calendar, Globe, HelpCircle, LogOut, ChevronRight, Moon, Bell, Shield, ArrowLeft, MessageCircle, Lock
+  User, Calendar, Globe, HelpCircle, LogOut, ChevronRight, Moon, Bell, Shield, ArrowLeft, MessageCircle, Lock, Home
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useAuth } from '@/contexts/AuthContext';
@@ -25,29 +25,26 @@ const ProfileSettings = ({ onLogout }: ProfileSettingsProps) => {
   const isDarkMode = theme === 'dark' || (theme === 'system' && resolvedTheme === 'dark');
   const { user, signOut } = useAuth();
 
-  // Counts
   const [eventsCount, setEventsCount] = useState(0);
-  const [phrasesCount] = useState(8); // Static phrases from CommunicationAssistant
+  const [housingFavCount, setHousingFavCount] = useState(0);
   const [interestedEvents, setInterestedEvents] = useState<any[]>([]);
 
-  // Edit profile
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editName, setEditName] = useState('');
-
-  // Sections
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
-  // Change password
+  const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [changingPassword, setChangingPassword] = useState(false);
 
-  // Feedback
   const [feedbackText, setFeedbackText] = useState('');
 
   useEffect(() => {
     if (user) {
       fetchEventCount();
       fetchInterestedEvents();
+      fetchHousingFavCount();
       setEditName(user.user_metadata?.display_name || '');
     }
   }, [user]);
@@ -56,6 +53,12 @@ const ProfileSettings = ({ onLogout }: ProfileSettingsProps) => {
     if (!user) return;
     const { count } = await supabase.from('event_attendees').select('*', { count: 'exact', head: true }).eq('user_id', user.id);
     setEventsCount(count || 0);
+  };
+
+  const fetchHousingFavCount = async () => {
+    if (!user) return;
+    const { count } = await supabase.from('favorites').select('*', { count: 'exact', head: true }).eq('user_id', user.id).eq('item_type', 'housing');
+    setHousingFavCount(count || 0);
   };
 
   const fetchInterestedEvents = async () => {
@@ -85,12 +88,27 @@ const ProfileSettings = ({ onLogout }: ProfileSettingsProps) => {
   };
 
   const handleChangePassword = async () => {
-    if (newPassword.length < 6) { toast.error('Password must be at least 6 characters'); return; }
-    if (newPassword !== confirmPassword) { toast.error('Passwords do not match'); return; }
+    if (!currentPassword) { toast.error('Please enter your current password'); return; }
+    if (newPassword.length < 6) { toast.error('New password must be at least 6 characters'); return; }
+    if (newPassword !== confirmPassword) { toast.error('New passwords do not match'); return; }
+
+    setChangingPassword(true);
+    // Verify current password by re-authenticating
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: user?.email || '',
+      password: currentPassword,
+    });
+    if (signInError) {
+      setChangingPassword(false);
+      toast.error('Current password is incorrect');
+      return;
+    }
+
     const { error } = await supabase.auth.updateUser({ password: newPassword });
+    setChangingPassword(false);
     if (error) { toast.error(error.message); return; }
     toast.success('Password changed successfully!');
-    setNewPassword(''); setConfirmPassword('');
+    setCurrentPassword(''); setNewPassword(''); setConfirmPassword('');
     setActiveSection(null);
   };
 
@@ -100,7 +118,6 @@ const ProfileSettings = ({ onLogout }: ProfileSettingsProps) => {
     setFeedbackText('');
   };
 
-  // Section views
   if (activeSection === 'events') {
     return (
       <div className="min-h-screen bg-gradient-subtle pb-20">
@@ -200,14 +217,20 @@ const ProfileSettings = ({ onLogout }: ProfileSettingsProps) => {
             </h3>
             <div className="space-y-4">
               <div>
+                <Label>Current Password</Label>
+                <Input type="password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} placeholder="Enter current password" />
+              </div>
+              <div>
                 <Label>New Password</Label>
                 <Input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} placeholder="Min 6 characters" />
               </div>
               <div>
-                <Label>Confirm Password</Label>
-                <Input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="Re-enter password" />
+                <Label>Confirm New Password</Label>
+                <Input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder="Re-enter new password" />
               </div>
-              <Button onClick={handleChangePassword} className="w-full bg-gradient-primary">Change Password</Button>
+              <Button onClick={handleChangePassword} disabled={changingPassword} className="w-full bg-gradient-primary">
+                {changingPassword ? 'Verifying...' : 'Change Password'}
+              </Button>
             </div>
           </Card>
         </div>
@@ -223,7 +246,6 @@ const ProfileSettings = ({ onLogout }: ProfileSettingsProps) => {
             <Button variant="ghost" size="sm" onClick={() => setActiveSection(null)}><ArrowLeft className="w-5 h-5" /></Button>
             <h1 className="text-2xl font-bold text-foreground">Help & Feedback</h1>
           </div>
-
           <Card className="p-6 shadow-card border-0 mb-4">
             <h3 className="font-semibold text-foreground mb-3">FAQs</h3>
             <div className="space-y-3">
@@ -232,20 +254,13 @@ const ProfileSettings = ({ onLogout }: ProfileSettingsProps) => {
               <div><p className="text-sm font-medium text-foreground">How do I mark interest in an event?</p><p className="text-sm text-muted-foreground">Go to Events tab and tap "Mark Interested" on any event.</p></div>
             </div>
           </Card>
-
           <Card className="p-6 shadow-card border-0 mb-4">
             <h3 className="font-semibold text-foreground mb-3">Contact Support</h3>
             <p className="text-sm text-muted-foreground">Email: support@nriconnect.app</p>
           </Card>
-
           <Card className="p-6 shadow-card border-0 mb-4">
             <h3 className="font-semibold text-foreground mb-3">Submit Feedback / Report an Issue</h3>
-            <Textarea
-              value={feedbackText}
-              onChange={e => setFeedbackText(e.target.value)}
-              placeholder="Tell us what you think or report an issue..."
-              className="mb-3"
-            />
+            <Textarea value={feedbackText} onChange={e => setFeedbackText(e.target.value)} placeholder="Tell us what you think or report an issue..." className="mb-3" />
             <Button onClick={handleSubmitFeedback} className="w-full bg-gradient-primary">Submit</Button>
           </Card>
         </div>
@@ -266,7 +281,6 @@ const ProfileSettings = ({ onLogout }: ProfileSettingsProps) => {
       <div className="pt-12 pb-6 px-6">
         <PageHeader title="Profile & Settings" className="mb-8" />
         
-        {/* User Profile Section */}
         <Card className="p-6 shadow-card border-0 mb-6">
           <div className="flex items-center space-x-4">
             <div className="w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center shadow-glow">
@@ -281,13 +295,10 @@ const ProfileSettings = ({ onLogout }: ProfileSettingsProps) => {
                 Member since {new Date(user?.created_at || Date.now()).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
               </p>
             </div>
-            <Button variant="outline" size="sm" className="rounded-xl" onClick={() => setIsEditOpen(true)}>
-              Edit
-            </Button>
+            <Button variant="outline" size="sm" className="rounded-xl" onClick={() => setIsEditOpen(true)}>Edit</Button>
           </div>
         </Card>
 
-        {/* Edit Profile Dialog */}
         <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
           <DialogContent>
             <DialogHeader><DialogTitle>Edit Profile</DialogTitle></DialogHeader>
@@ -301,28 +312,22 @@ const ProfileSettings = ({ onLogout }: ProfileSettingsProps) => {
           </DialogContent>
         </Dialog>
 
-        {/* Quick Stats - removed Bookings */}
         <div className="grid grid-cols-2 gap-4 mb-6">
           <Card className="p-4 text-center shadow-card border-0">
             <div className="text-2xl font-bold text-success mb-1">{eventsCount}</div>
             <div className="text-xs text-muted-foreground">Events</div>
           </Card>
           <Card className="p-4 text-center shadow-card border-0">
-            <div className="text-2xl font-bold text-accent mb-1">{phrasesCount}</div>
-            <div className="text-xs text-muted-foreground">Phrases</div>
+            <div className="text-2xl font-bold text-primary mb-1">{housingFavCount}</div>
+            <div className="text-xs text-muted-foreground flex items-center justify-center gap-1"><Home className="w-3 h-3" /> Housing</div>
           </Card>
         </div>
 
-        {/* Settings */}
         <Card className="shadow-card border-0 mb-6">
-          <div className="p-4 border-b border-border">
-            <h3 className="font-semibold text-foreground">Preferences</h3>
-          </div>
+          <div className="p-4 border-b border-border"><h3 className="font-semibold text-foreground">Preferences</h3></div>
           <div className="p-4 flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-muted rounded-xl flex items-center justify-center">
-                <Moon className="w-5 h-5 text-muted-foreground" />
-              </div>
+              <div className="w-10 h-10 bg-muted rounded-xl flex items-center justify-center"><Moon className="w-5 h-5 text-muted-foreground" /></div>
               <div>
                 <p className="font-medium text-foreground">Dark Mode</p>
                 <p className="text-sm text-muted-foreground">Switch to dark theme</p>
@@ -332,24 +337,14 @@ const ProfileSettings = ({ onLogout }: ProfileSettingsProps) => {
           </div>
         </Card>
 
-        {/* Menu Items */}
         <Card className="shadow-card border-0 mb-6">
-          <div className="p-4 border-b border-border">
-            <h3 className="font-semibold text-foreground">Account</h3>
-          </div>
+          <div className="p-4 border-b border-border"><h3 className="font-semibold text-foreground">Account</h3></div>
           {menuItems.map((item, index) => {
             const Icon = item.icon;
             return (
-              <button
-                key={item.id}
-                onClick={() => setActiveSection(item.id)}
-                className={`w-full p-4 flex items-center space-x-3 hover:bg-muted/50 transition-colors ${
-                  index !== menuItems.length - 1 ? 'border-b border-border' : ''
-                }`}
-              >
-                <div className="w-10 h-10 bg-muted rounded-xl flex items-center justify-center">
-                  <Icon className="w-5 h-5 text-muted-foreground" />
-                </div>
+              <button key={item.id} onClick={() => setActiveSection(item.id)}
+                className={`w-full p-4 flex items-center space-x-3 hover:bg-muted/50 transition-colors ${index !== menuItems.length - 1 ? 'border-b border-border' : ''}`}>
+                <div className="w-10 h-10 bg-muted rounded-xl flex items-center justify-center"><Icon className="w-5 h-5 text-muted-foreground" /></div>
                 <div className="flex-1 text-left">
                   <p className="font-medium text-foreground">{item.title}</p>
                   <p className="text-sm text-muted-foreground">{item.description}</p>
@@ -360,14 +355,8 @@ const ProfileSettings = ({ onLogout }: ProfileSettingsProps) => {
           })}
         </Card>
 
-        {/* Logout Button */}
-        <Button 
-          variant="outline" 
-          className="w-full flex items-center justify-center space-x-2 text-destructive border-destructive/20 hover:bg-destructive/10 rounded-2xl py-6"
-          onClick={handleLogout}
-        >
-          <LogOut className="w-5 h-5" />
-          <span>Sign Out</span>
+        <Button variant="outline" className="w-full flex items-center justify-center space-x-2 text-destructive border-destructive/20 hover:bg-destructive/10 rounded-2xl py-6" onClick={handleLogout}>
+          <LogOut className="w-5 h-5" /><span>Sign Out</span>
         </Button>
       </div>
     </div>

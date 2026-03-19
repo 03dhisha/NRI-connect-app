@@ -14,6 +14,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import PageHeader from '@/components/PageHeader';
 import { useFavorites } from '@/hooks/useFavorites';
+import { useActivityLog } from '@/hooks/useActivityLog';
 
 interface CulturalBridgeProps {
   defaultTab?: string;
@@ -21,6 +22,7 @@ interface CulturalBridgeProps {
 
 const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
   const { user } = useAuth();
+  const { logActivity } = useActivityLog();
   const [activeTab, setActiveTab] = useState(defaultTab || 'community');
   const restFavorites = useFavorites('restaurant');
   const eventFavorites = useFavorites('event');
@@ -178,6 +180,8 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
     } else {
       await supabase.from('group_members').insert({ group_id: groupId, user_id: user.id });
       setJoinedGroupIds(prev => new Set(prev).add(groupId));
+      const group = groups.find(g => g.id === groupId);
+      logActivity('community_join', `Joined community: ${group?.name || 'Unknown'}`);
     }
   };
 
@@ -241,6 +245,8 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
     } else {
       await supabase.from('event_attendees').insert({ event_id: eventId, user_id: user.id });
       setInterestedEventIds(prev => new Set(prev).add(eventId));
+      const event = events.find(e => e.id === eventId);
+      logActivity('event_interest', `Marked interest in event: ${event?.title || 'Unknown'}`);
     }
   };
 

@@ -4,10 +4,12 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Search, MapPin, Star, Home, Plus, Copy, Check, Heart } from 'lucide-react';
+import { Search, MapPin, Star, Home, Plus, Copy, Check, Heart, Trash2 } from 'lucide-react';
 import { useFavorites } from '@/hooks/useFavorites';
+import { useActivityLog } from '@/hooks/useActivityLog';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -34,6 +36,7 @@ interface HousingListing {
 
 const HousingNavigator = () => {
   const { user } = useAuth();
+  const { logActivity } = useActivityLog();
   const [searchQuery, setSearchQuery] = useState('');
   const [listings, setListings] = useState<HousingListing[]>([]);
   const [isAddOpen, setIsAddOpen] = useState(false);
@@ -41,6 +44,7 @@ const HousingNavigator = () => {
   const [selectedFilter, setSelectedFilter] = useState('All');
   const [userRatings, setUserRatings] = useState<Record<string, number>>({});
   const [selectedListingId, setSelectedListingId] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const listingRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const { toggleFavorite, isFavorite } = useFavorites('housing');
 
@@ -73,7 +77,21 @@ const HousingNavigator = () => {
   useEffect(() => {
     fetchListings();
     fetchUserRatings();
+    if (user) {
+      supabase.from('user_roles').select('role').eq('user_id', user.id).eq('role', 'admin').then(({ data }) => {
+        setIsAdmin(data && data.length > 0 ? true : false);
+      });
+    }
   }, [user]);
+
+  // Log search activity
+  useEffect(() => {
+    if (!searchQuery || searchQuery.length < 3) return;
+    const timeout = setTimeout(() => {
+      logActivity('housing_search', `Searched housing for "${searchQuery}"`);
+    }, 1500);
+    return () => clearTimeout(timeout);
+  }, [searchQuery]);
 
   const handleAddListing = async () => {
     if (!user || !newTitle || !newLocation || !newPhone || !newRent) {
@@ -103,6 +121,13 @@ const HousingNavigator = () => {
     setNewTitle(''); setNewLocation(''); setNewPhone(''); setNewRent('');
     setNewBedrooms('1'); setNewDescription(''); setNewAmenities('');
     setNewLat(null); setNewLng(null);
+  };
+
+  const handleDeleteListing = async (listing: HousingListing) => {
+    const { error } = await supabase.from('housing_listings').delete().eq('id', listing.id);
+    if (error) { toast.error('Failed to delete listing'); return; }
+    toast.success('Listing deleted');
+    setListings(prev => prev.filter(l => l.id !== listing.id));
   };
 
   const handleCopyPhone = (id: string, phone: string) => {
@@ -142,18 +167,22 @@ const HousingNavigator = () => {
 
   const handleCardClick = (id: string) => {
     setSelectedListingId(id);
+    logActivity('housing_view', `Viewed listing: ${listings.find(l => l.id === id)?.title || 'Unknown'}`);
   };
 
-  const filters = ['All', '1BHK', '2BHK', '3BHK'];
+  const filters = ['All', '1BHK', '2BHK', '3BHK', 'PG'];
 
   const filteredListings = listings.filter(l => {
     const matchesSearch = l.title.toLowerCase().includes(searchQuery.toLowerCase()) || l.location.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesFilter = selectedFilter === 'All' ||
       (selectedFilter === '1BHK' && l.bedrooms === 1) ||
       (selectedFilter === '2BHK' && l.bedrooms === 2) ||
-      (selectedFilter === '3BHK' && l.bedrooms === 3);
+      (selectedFilter === '3BHK' && l.bedrooms === 3) ||
+      (selectedFilter === 'PG' && l.bedrooms === 0);
     return matchesSearch && matchesFilter;
   });
+
+  const canDelete = (listing: HousingListing) => listing.user_id === user?.id || isAdmin;
 
   return (
     <div className="min-h-screen bg-gradient-subtle pb-20">
@@ -170,24 +199,15 @@ const HousingNavigator = () => {
           />
         </div>
 
-        {/* OpenStreetMap */}
         <div className="mb-6">
-          <HousingMap
-            listings={filteredListings}
-            selectedListingId={selectedListingId}
-            onMarkerClick={handleMarkerClick}
-          />
+          <HousingMap listings={filteredListings} selectedListingId={selectedListingId} onMarkerClick={handleMarkerClick} />
         </div>
 
-        {/* Filter Tags + Add Button */}
         <div className="flex items-center space-x-3 mb-6 overflow-x-auto pb-2">
           {filters.map((filter) => (
-            <Badge
-              key={filter}
-              variant={selectedFilter === filter ? 'default' : 'secondary'}
+            <Badge key={filter} variant={selectedFilter === filter ? 'default' : 'secondary'}
               className="whitespace-nowrap px-4 py-2 rounded-md cursor-pointer"
-              onClick={() => setSelectedFilter(filter)}
-            >
+              onClick={() => setSelectedFilter(filter)}>
               {filter}
             </Badge>
           ))}
@@ -198,27 +218,36 @@ const HousingNavigator = () => {
               </Button>
             </DialogTrigger>
             <DialogContent className="max-h-[85vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Add New Listing</DialogTitle>
-              </DialogHeader>
+              <DialogHeader><DialogTitle>Add New Listing</DialogTitle></DialogHeader>
               <div className="space-y-4 pt-4">
                 <div><Label>Title *</Label><Input value={newTitle} onChange={e => setNewTitle(e.target.value)} placeholder="e.g. Modern 2BHK Apartment" /></div>
                 <div><Label>Location *</Label><Input value={newLocation} onChange={e => setNewLocation(e.target.value)} placeholder="e.g. Koramangala, Bangalore" /></div>
                 <div><Label>Phone Number *</Label><Input value={newPhone} onChange={e => setNewPhone(e.target.value)} placeholder="e.g. +91 9876543210" /></div>
                 <div className="grid grid-cols-2 gap-4">
                   <div><Label>Rent (₹/month) *</Label><Input type="number" value={newRent} onChange={e => setNewRent(e.target.value)} placeholder="25000" /></div>
-                  <div><Label>Bedrooms</Label><Input type="number" value={newBedrooms} onChange={e => setNewBedrooms(e.target.value)} min="0" max="10" /></div>
+                  <div>
+                    <Label>Type</Label>
+                    <select value={newBedrooms} onChange={e => setNewBedrooms(e.target.value)}
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+                      <option value="0">PG</option>
+                      <option value="1">1 BHK</option>
+                      <option value="2">2 BHK</option>
+                      <option value="3">3 BHK</option>
+                    </select>
+                  </div>
                 </div>
                 <div><Label>Description</Label><Input value={newDescription} onChange={e => setNewDescription(e.target.value)} placeholder="Brief description..." /></div>
                 <div><Label>Amenities (comma separated)</Label><Input value={newAmenities} onChange={e => setNewAmenities(e.target.value)} placeholder="WiFi, Parking, Kitchen" /></div>
                 <div>
-                  <Label>Pin Location on Map (tap to place marker)</Label>
+                  <Label>Pin Location on Map (optional)</Label>
                   <div className="mt-2">
-                    <LocationPicker latitude={newLat} longitude={newLng} onLocationChange={(lat, lng) => { setNewLat(lat); setNewLng(lng); }} />
+                    <LocationPicker
+                      latitude={newLat}
+                      longitude={newLng}
+                      onLocationChange={(lat, lng) => { setNewLat(lat); setNewLng(lng); }}
+                      searchLocation={newLocation}
+                    />
                   </div>
-                  {newLat && newLng && (
-                    <p className="text-xs text-muted-foreground mt-1">📍 {newLat.toFixed(4)}, {newLng.toFixed(4)}</p>
-                  )}
                 </div>
                 <Button onClick={handleAddListing} className="w-full bg-gradient-primary">Add Listing</Button>
               </div>
@@ -226,7 +255,6 @@ const HousingNavigator = () => {
           </Dialog>
         </div>
 
-        {/* Listings */}
         <div className="space-y-4">
           {filteredListings.length === 0 && (
             <div className="text-center py-12">
@@ -235,12 +263,10 @@ const HousingNavigator = () => {
             </div>
           )}
           {filteredListings.map((listing) => (
-            <Card
-              key={listing.id}
+            <Card key={listing.id}
               ref={(el) => { listingRefs.current[listing.id] = el; }}
               className={`p-0 shadow-card border-0 overflow-hidden cursor-pointer transition-all duration-200 ${selectedListingId === listing.id ? 'ring-2 ring-primary' : ''}`}
-              onClick={() => handleCardClick(listing.id)}
-            >
+              onClick={() => handleCardClick(listing.id)}>
               <div className="flex">
                 <div className="w-24 h-full min-h-[120px] bg-gradient-to-br from-muted to-muted/60 flex items-center justify-center relative">
                   <Home className="w-8 h-8 text-muted-foreground" />
@@ -251,7 +277,7 @@ const HousingNavigator = () => {
                   )}
                 </div>
                 <div className="flex-1 p-4">
-                    <div className="flex justify-between items-start mb-2">
+                  <div className="flex justify-between items-start mb-2">
                     <div>
                       <h3 className="font-semibold text-foreground">{listing.title}</h3>
                       <p className="text-sm text-muted-foreground flex items-center">
@@ -262,6 +288,25 @@ const HousingNavigator = () => {
                       <button onClick={(e) => { e.stopPropagation(); toggleFavorite(listing.id); }} className="p-1">
                         <Heart className={`w-4 h-4 ${isFavorite(listing.id) ? 'text-destructive fill-current' : 'text-muted-foreground'}`} />
                       </button>
+                      {canDelete(listing) && (
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <button onClick={(e) => e.stopPropagation()} className="p-1 hover:text-destructive">
+                              <Trash2 className="w-4 h-4 text-muted-foreground hover:text-destructive" />
+                            </button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Delete Listing</AlertDialogTitle>
+                              <AlertDialogDescription>Are you sure you want to delete "{listing.title}"? This action cannot be undone.</AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => handleDeleteListing(listing)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Delete</AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      )}
                       <div className="text-right">
                         <p className="text-lg font-bold text-primary">₹{listing.rent_amount.toLocaleString()}</p>
                         <p className="text-xs text-muted-foreground">/month</p>
@@ -283,9 +328,8 @@ const HousingNavigator = () => {
                         <span className="text-sm font-medium ml-1">{Number(listing.average_rating).toFixed(1)}</span>
                         <span className="text-sm text-muted-foreground">({listing.total_ratings})</span>
                       </div>
-                      <Badge variant="outline" className="text-xs">{listing.bedrooms === 0 ? 'Studio' : `${listing.bedrooms}BHK`}</Badge>
+                      <Badge variant="outline" className="text-xs">{listing.bedrooms === 0 ? 'PG' : `${listing.bedrooms}BHK`}</Badge>
                     </div>
-
                     <div className="flex items-center space-x-0.5">
                       {[1, 2, 3, 4, 5].map(star => (
                         <button key={star} onClick={(e) => { e.stopPropagation(); handleRate(listing.id, star); }} className="p-0">
