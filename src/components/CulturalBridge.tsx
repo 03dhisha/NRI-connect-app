@@ -14,6 +14,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import PageHeader from '@/components/PageHeader';
 import { useFavorites } from '@/hooks/useFavorites';
+import { useActivityLog } from '@/hooks/useActivityLog';
 
 interface CulturalBridgeProps {
   defaultTab?: string;
