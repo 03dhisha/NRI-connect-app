@@ -309,6 +309,20 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
     }
   };
 
+  const handleDeleteEvent = async (eventId: string) => {
+    const { error } = await supabase.from('events').delete().eq('id', eventId);
+    if (error) { toast.error('Failed to delete event'); return; }
+    setEvents(prev => prev.filter(e => e.id !== eventId));
+    toast.success('Event deleted');
+  };
+
+  const handleDeleteRestaurant = async (restaurantId: string) => {
+    const { error } = await supabase.from('restaurants').delete().eq('id', restaurantId);
+    if (error) { toast.error('Failed to delete restaurant'); return; }
+    setRestaurants(prev => prev.filter(r => r.id !== restaurantId));
+    toast.success('Restaurant deleted');
+  };
+
   // Group Members View
   if (viewingMembersGroup) {
     return (
