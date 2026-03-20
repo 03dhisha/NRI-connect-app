@@ -27,6 +27,15 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
   const [activeTab, setActiveTab] = useState(defaultTab || 'community');
   const restFavorites = useFavorites('restaurant');
   const eventFavorites = useFavorites('event');
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      supabase.from('user_roles').select('role').eq('user_id', user.id).eq('role', 'admin').then(({ data }) => {
+        setIsAdmin(!!(data && data.length > 0));
+      });
+    }
+  }, [user]);
 
   useEffect(() => {
     if (defaultTab) setActiveTab(defaultTab);
