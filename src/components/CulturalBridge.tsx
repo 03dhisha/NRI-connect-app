@@ -6,8 +6,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Switch } from '@/components/ui/switch';
-import { Users, Calendar, MapPin, Plus, Clock, Star, ChefHat, ExternalLink, Send, ArrowLeft, Heart, User } from 'lucide-react';
+import { Users, Calendar, MapPin, Plus, Clock, Star, ChefHat, ExternalLink, Send, ArrowLeft, Heart, User, Trash2 } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -26,6 +27,15 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
   const [activeTab, setActiveTab] = useState(defaultTab || 'community');
   const restFavorites = useFavorites('restaurant');
   const eventFavorites = useFavorites('event');
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      supabase.from('user_roles').select('role').eq('user_id', user.id).eq('role', 'admin').then(({ data }) => {
+        setIsAdmin(!!(data && data.length > 0));
+      });
+    }
+  }, [user]);
 
   useEffect(() => {
     if (defaultTab) setActiveTab(defaultTab);
@@ -299,6 +309,20 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
     }
   };
 
+  const handleDeleteEvent = async (eventId: string) => {
+    const { error } = await supabase.from('events').delete().eq('id', eventId);
+    if (error) { toast.error('Failed to delete event'); return; }
+    setEvents(prev => prev.filter(e => e.id !== eventId));
+    toast.success('Event deleted');
+  };
+
+  const handleDeleteRestaurant = async (restaurantId: string) => {
+    const { error } = await supabase.from('restaurants').delete().eq('id', restaurantId);
+    if (error) { toast.error('Failed to delete restaurant'); return; }
+    setRestaurants(prev => prev.filter(r => r.id !== restaurantId));
+    toast.success('Restaurant deleted');
+  };
+
   // Group Members View
   if (viewingMembersGroup) {
     return (
@@ -469,9 +493,30 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
               <Card key={event.id} className="p-6 shadow-card border-0">
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="font-semibold text-foreground">{event.title}</h3>
-                  <button onClick={() => eventFavorites.toggleFavorite(event.id)} className="p-1">
-                    <Heart className={`w-4 h-4 ${eventFavorites.isFavorite(event.id) ? 'text-destructive fill-current' : 'text-muted-foreground'}`} />
-                  </button>
+                  <div className="flex items-center gap-1">
+                    <button onClick={() => eventFavorites.toggleFavorite(event.id)} className="p-1">
+                      <Heart className={`w-4 h-4 ${eventFavorites.isFavorite(event.id) ? 'text-destructive fill-current' : 'text-muted-foreground'}`} />
+                    </button>
+                    {(user?.id === event.user_id || isAdmin) && (
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <button className="p-1 text-muted-foreground hover:text-destructive transition-colors">
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete Event</AlertDialogTitle>
+                            <AlertDialogDescription>Are you sure you want to delete this event? This action cannot be undone.</AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleDeleteEvent(event.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Delete</AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    )}
+                  </div>
                 </div>
                 {event.description && <p className="text-sm text-muted-foreground mb-3">{event.description}</p>}
                 <div className="space-y-2 mb-4">
@@ -565,6 +610,25 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
                     <button onClick={() => restFavorites.toggleFavorite(restaurant.id)} className="p-1">
                       <Heart className={`w-4 h-4 ${restFavorites.isFavorite(restaurant.id) ? 'text-destructive fill-current' : 'text-muted-foreground'}`} />
                     </button>
+                    {(user?.id === restaurant.user_id || isAdmin) && (
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <button className="p-1 text-muted-foreground hover:text-destructive transition-colors">
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete Restaurant</AlertDialogTitle>
+                            <AlertDialogDescription>Are you sure you want to delete this restaurant? This action cannot be undone.</AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleDeleteRestaurant(restaurant.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Delete</AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    )}
                     <div className="flex items-center">
                       <Star className="w-4 h-4 text-warning fill-current mr-1" />
                       <span className="text-sm font-medium">{Number(restaurant.average_rating).toFixed(1)}</span>
