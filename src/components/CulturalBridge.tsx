@@ -493,9 +493,30 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
               <Card key={event.id} className="p-6 shadow-card border-0">
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="font-semibold text-foreground">{event.title}</h3>
-                  <button onClick={() => eventFavorites.toggleFavorite(event.id)} className="p-1">
-                    <Heart className={`w-4 h-4 ${eventFavorites.isFavorite(event.id) ? 'text-destructive fill-current' : 'text-muted-foreground'}`} />
-                  </button>
+                  <div className="flex items-center gap-1">
+                    <button onClick={() => eventFavorites.toggleFavorite(event.id)} className="p-1">
+                      <Heart className={`w-4 h-4 ${eventFavorites.isFavorite(event.id) ? 'text-destructive fill-current' : 'text-muted-foreground'}`} />
+                    </button>
+                    {(user?.id === event.user_id || isAdmin) && (
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <button className="p-1 text-muted-foreground hover:text-destructive transition-colors">
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete Event</AlertDialogTitle>
+                            <AlertDialogDescription>Are you sure you want to delete this event? This action cannot be undone.</AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleDeleteEvent(event.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Delete</AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    )}
+                  </div>
                 </div>
                 {event.description && <p className="text-sm text-muted-foreground mb-3">{event.description}</p>}
                 <div className="space-y-2 mb-4">
