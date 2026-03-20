@@ -610,6 +610,25 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
                     <button onClick={() => restFavorites.toggleFavorite(restaurant.id)} className="p-1">
                       <Heart className={`w-4 h-4 ${restFavorites.isFavorite(restaurant.id) ? 'text-destructive fill-current' : 'text-muted-foreground'}`} />
                     </button>
+                    {(user?.id === restaurant.user_id || isAdmin) && (
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <button className="p-1 text-muted-foreground hover:text-destructive transition-colors">
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete Restaurant</AlertDialogTitle>
+                            <AlertDialogDescription>Are you sure you want to delete this restaurant? This action cannot be undone.</AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleDeleteRestaurant(restaurant.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Delete</AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    )}
                     <div className="flex items-center">
                       <Star className="w-4 h-4 text-warning fill-current mr-1" />
                       <span className="text-sm font-medium">{Number(restaurant.average_rating).toFixed(1)}</span>
