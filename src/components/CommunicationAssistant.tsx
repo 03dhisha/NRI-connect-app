@@ -27,14 +27,18 @@ const CommunicationAssistant = () => {
   ];
 
   const phrases: Phrase[] = [
-    { id: '1', english: 'Hello, how are you?', hindi: 'नमस्ते, आप कैसे हैं?', phonetic: 'namaste, aap kaise hain?', category: 'daily' },
-    { id: '2', english: 'Where is the nearest metro station?', hindi: 'सबसे नजदीकी मेट्रो स्टेशन कहाँ है?', phonetic: 'sabse nazdeeki metro station kahan hai?', category: 'travel' },
-    { id: '3', english: 'I would like to order food', hindi: 'मैं खाना ऑर्डर करना चाहूंगा', phonetic: 'main khana order karna chahunga', category: 'food' },
-    { id: '4', english: 'Please call a doctor', hindi: 'कृपया डॉक्टर को बुलाएं', phonetic: 'kripaya doctor ko bulayen', category: 'emergency' },
-    { id: '5', english: 'How much does this cost?', hindi: 'इसकी कीमत क्या है?', phonetic: 'iski keemat kya hai?', category: 'daily' },
-    { id: '6', english: 'Can you help me?', hindi: 'क्या आप मेरी मदद कर सकते हैं?', phonetic: 'kya aap meri madad kar sakte hain?', category: 'daily' },
-    { id: '7', english: 'Where is the bathroom?', hindi: 'बाथरूम कहाँ है?', phonetic: 'bathroom kahan hai?', category: 'travel' },
-    { id: '8', english: 'This is spicy', hindi: 'यह तीखा है', phonetic: 'yeh teekhaa hai', category: 'food' }
+    { id: '1', english: 'Hello, how are you?', hindi: 'Namaskara, neevu hegiddira?', phonetic: 'na-mas-kaa-ra, nee-vu he-gid-dee-ra?', category: 'daily' },
+    { id: '2', english: 'Where is the nearest metro station?', hindi: 'Hattira metro station elli ide?', phonetic: 'hat-ti-ra metro station el-li i-de?', category: 'travel' },
+    { id: '3', english: 'I would like to order food', hindi: 'Naanu oota order maadbeku', phonetic: 'naa-nu oo-ta order maad-be-ku', category: 'food' },
+    { id: '4', english: 'Please call a doctor', hindi: 'Dayavittu doctor ge call maadi', phonetic: 'da-ya-vit-tu doctor ge call maa-di', category: 'emergency' },
+    { id: '5', english: 'How much does this cost?', hindi: 'Idara bele eshtu?', phonetic: 'i-da-ra be-le esh-tu?', category: 'daily' },
+    { id: '6', english: 'Can you help me?', hindi: 'Nanage sahaya maadtira?', phonetic: 'na-na-ge sa-haa-ya maad-tee-ra?', category: 'daily' },
+    { id: '7', english: 'Where is the bathroom?', hindi: 'Bathroom elli ide?', phonetic: 'bathroom el-li i-de?', category: 'travel' },
+    { id: '8', english: 'This is spicy', hindi: 'Idu khara ide', phonetic: 'i-du kha-ra i-de', category: 'food' },
+    { id: '9', english: 'Thank you very much', hindi: 'Thumba dhanyavadagalu', phonetic: 'thum-ba dhan-ya-vaa-da-ga-lu', category: 'daily' },
+    { id: '10', english: 'I need help, it is an emergency', hindi: 'Nanage sahaya beku, idu emergency', phonetic: 'na-na-ge sa-haa-ya be-ku, i-du emergency', category: 'emergency' },
+    { id: '11', english: 'Please give me water', hindi: 'Dayavittu nanage neeru kodi', phonetic: 'da-ya-vit-tu na-na-ge nee-ru ko-di', category: 'food' },
+    { id: '12', english: 'I am lost, can you guide me?', hindi: 'Naanu daari tappiddini, nanage help maadtira?', phonetic: 'naa-nu daa-ri tap-pid-di-ni, na-na-ge help maad-tee-ra?', category: 'travel' }
   ];
 
   const filteredPhrases = phrases.filter(phrase => {
