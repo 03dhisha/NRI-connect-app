@@ -43,8 +43,8 @@ const CommunicationAssistant = () => {
 
   const filteredPhrases = phrases.filter(phrase => {
     const matchesSearch = phrase.english.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         phrase.hindi.includes(searchQuery) ||
-                         phrase.phonetic.toLowerCase().includes(searchQuery.toLowerCase());
+                         phrase.hindi.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         phrase.kannada.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || phrase.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
