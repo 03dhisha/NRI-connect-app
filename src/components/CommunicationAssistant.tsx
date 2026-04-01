@@ -10,7 +10,7 @@ interface Phrase {
   id: string;
   english: string;
   hindi: string;
-  phonetic: string;
+  kannada: string;
   category: string;
 }
 
