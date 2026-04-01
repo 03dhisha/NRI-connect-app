@@ -10,7 +10,7 @@ interface Phrase {
   id: string;
   english: string;
   hindi: string;
-  phonetic: string;
+  kannada: string;
   category: string;
 }
 
@@ -27,24 +27,24 @@ const CommunicationAssistant = () => {
   ];
 
   const phrases: Phrase[] = [
-    { id: '1', english: 'Hello, how are you?', hindi: 'Namaskara, neevu hegiddira?', phonetic: 'na-mas-kaa-ra, nee-vu he-gid-dee-ra?', category: 'daily' },
-    { id: '2', english: 'Where is the nearest metro station?', hindi: 'Hattira metro station elli ide?', phonetic: 'hat-ti-ra metro station el-li i-de?', category: 'travel' },
-    { id: '3', english: 'I would like to order food', hindi: 'Naanu oota order maadbeku', phonetic: 'naa-nu oo-ta order maad-be-ku', category: 'food' },
-    { id: '4', english: 'Please call a doctor', hindi: 'Dayavittu doctor ge call maadi', phonetic: 'da-ya-vit-tu doctor ge call maa-di', category: 'emergency' },
-    { id: '5', english: 'How much does this cost?', hindi: 'Idara bele eshtu?', phonetic: 'i-da-ra be-le esh-tu?', category: 'daily' },
-    { id: '6', english: 'Can you help me?', hindi: 'Nanage sahaya maadtira?', phonetic: 'na-na-ge sa-haa-ya maad-tee-ra?', category: 'daily' },
-    { id: '7', english: 'Where is the bathroom?', hindi: 'Bathroom elli ide?', phonetic: 'bathroom el-li i-de?', category: 'travel' },
-    { id: '8', english: 'This is spicy', hindi: 'Idu khara ide', phonetic: 'i-du kha-ra i-de', category: 'food' },
-    { id: '9', english: 'Thank you very much', hindi: 'Thumba dhanyavadagalu', phonetic: 'thum-ba dhan-ya-vaa-da-ga-lu', category: 'daily' },
-    { id: '10', english: 'I need help, it is an emergency', hindi: 'Nanage sahaya beku, idu emergency', phonetic: 'na-na-ge sa-haa-ya be-ku, i-du emergency', category: 'emergency' },
-    { id: '11', english: 'Please give me water', hindi: 'Dayavittu nanage neeru kodi', phonetic: 'da-ya-vit-tu na-na-ge nee-ru ko-di', category: 'food' },
-    { id: '12', english: 'I am lost, can you guide me?', hindi: 'Naanu daari tappiddini, nanage help maadtira?', phonetic: 'naa-nu daa-ri tap-pid-di-ni, na-na-ge help maad-tee-ra?', category: 'travel' }
+    { id: '1', english: 'Hello, how are you?', hindi: 'Namaste, aap kaise hain?', kannada: 'Namaskara, neevu hegiddira?', category: 'daily' },
+    { id: '2', english: 'Where is the nearest metro station?', hindi: 'Sabse nazdeeki metro station kahan hai?', kannada: 'Hattira metro station elli ide?', category: 'travel' },
+    { id: '3', english: 'I would like to order food', hindi: 'Mujhe khana order karna hai', kannada: 'Naanu oota order maadbeku', category: 'food' },
+    { id: '4', english: 'Please call a doctor', hindi: 'Kripya doctor ko bulaiye', kannada: 'Dayavittu doctor ge call maadi', category: 'emergency' },
+    { id: '5', english: 'How much does this cost?', hindi: 'Iska daam kitna hai?', kannada: 'Idara bele eshtu?', category: 'daily' },
+    { id: '6', english: 'Can you help me?', hindi: 'Kya aap meri madad kar sakte hain?', kannada: 'Nanage sahaya maadtira?', category: 'daily' },
+    { id: '7', english: 'Where is the bathroom?', hindi: 'Bathroom kahan hai?', kannada: 'Bathroom elli ide?', category: 'travel' },
+    { id: '8', english: 'This is spicy', hindi: 'Yeh teekha hai', kannada: 'Idu khara ide', category: 'food' },
+    { id: '9', english: 'Thank you very much', hindi: 'Bahut dhanyavaad', kannada: 'Thumba dhanyavadagalu', category: 'daily' },
+    { id: '10', english: 'I need help, it is an emergency', hindi: 'Mujhe madad chahiye, yeh emergency hai', kannada: 'Nanage sahaya beku, idu emergency', category: 'emergency' },
+    { id: '11', english: 'Please give me water', hindi: 'Kripya mujhe paani dijiye', kannada: 'Dayavittu nanage neeru kodi', category: 'food' },
+    { id: '12', english: 'I am lost, can you guide me?', hindi: 'Main rasta bhool gaya, kya aap meri madad kar sakte hain?', kannada: 'Naanu daari tappiddini, nanage help maadtira?', category: 'travel' }
   ];
 
   const filteredPhrases = phrases.filter(phrase => {
     const matchesSearch = phrase.english.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         phrase.hindi.includes(searchQuery) ||
-                         phrase.phonetic.toLowerCase().includes(searchQuery.toLowerCase());
+                         phrase.hindi.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         phrase.kannada.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || phrase.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
@@ -93,12 +93,12 @@ const CommunicationAssistant = () => {
                   <p className="text-foreground font-medium">{phrase.english}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">Kannada (Transliteration)</p>
+                  <p className="text-sm text-muted-foreground mb-1">Hindi</p>
                   <p className="text-foreground font-medium text-lg">{phrase.hindi}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">Pronunciation</p>
-                  <p className="text-foreground italic">{phrase.phonetic}</p>
+                  <p className="text-sm text-muted-foreground mb-1">Kannada</p>
+                  <p className="text-foreground font-medium text-lg">{phrase.kannada}</p>
                 </div>
                 <div className="pt-2">
                   <Badge variant="secondary" className="capitalize">{phrase.category}</Badge>
