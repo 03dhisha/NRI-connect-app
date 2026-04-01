@@ -93,12 +93,12 @@ const CommunicationAssistant = () => {
                   <p className="text-foreground font-medium">{phrase.english}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">Kannada (Transliteration)</p>
+                  <p className="text-sm text-muted-foreground mb-1">Hindi</p>
                   <p className="text-foreground font-medium text-lg">{phrase.hindi}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">Pronunciation</p>
-                  <p className="text-foreground italic">{phrase.phonetic}</p>
+                  <p className="text-sm text-muted-foreground mb-1">Kannada</p>
+                  <p className="text-foreground font-medium text-lg">{phrase.kannada}</p>
                 </div>
                 <div className="pt-2">
                   <Badge variant="secondary" className="capitalize">{phrase.category}</Badge>
