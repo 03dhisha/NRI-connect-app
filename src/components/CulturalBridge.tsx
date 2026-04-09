@@ -56,6 +56,10 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
   const [groupMembers, setGroupMembers] = useState<any[]>([]);
   const [loadingMembers, setLoadingMembers] = useState(false);
 
+  // Member profile & personal chat state
+  const [viewingProfileUserId, setViewingProfileUserId] = useState<string | null>(null);
+  const [personalChatUserId, setPersonalChatUserId] = useState<string | null>(null);
+
   // Group chat state
   const [openGroupChat, setOpenGroupChat] = useState<any | null>(null);
   const [messages, setMessages] = useState<any[]>([]);
