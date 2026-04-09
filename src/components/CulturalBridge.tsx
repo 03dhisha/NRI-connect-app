@@ -329,6 +329,30 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
     toast.success('Restaurant deleted');
   };
 
+  // Personal Chat View
+  if (personalChatUserId) {
+    return (
+      <PersonalChat
+        otherUserId={personalChatUserId}
+        onBack={() => setPersonalChatUserId(null)}
+      />
+    );
+  }
+
+  // Member Profile View
+  if (viewingProfileUserId) {
+    return (
+      <MemberProfile
+        userId={viewingProfileUserId}
+        onBack={() => setViewingProfileUserId(null)}
+        onStartChat={(uid) => {
+          setViewingProfileUserId(null);
+          setPersonalChatUserId(uid);
+        }}
+      />
+    );
+  }
+
   // Group Members View
   if (viewingMembersGroup) {
     return (
@@ -339,7 +363,7 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
           </Button>
           <div>
             <h2 className="font-semibold text-foreground">{viewingMembersGroup.name}</h2>
-            <p className="text-xs text-muted-foreground">Members</p>
+            <p className="text-xs text-muted-foreground">{groupMembers.length} Members</p>
           </div>
         </div>
         <div className="px-6 py-4 space-y-3">
@@ -348,7 +372,8 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
             <p className="text-center text-muted-foreground py-8">No members yet.</p>
           )}
           {groupMembers.map((member) => (
-            <Card key={member.user_id} className="p-4 shadow-card border-0">
+            <Card key={member.user_id} className="p-4 shadow-card border-0 cursor-pointer hover:bg-muted/30 transition-colors"
+              onClick={() => setViewingProfileUserId(member.user_id)}>
               <div className="flex items-center space-x-3">
                 <Avatar className="w-10 h-10">
                   <AvatarFallback className="bg-primary/10 text-primary font-semibold">
@@ -366,6 +391,12 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
                     Joined {new Date(member.joined_at).toLocaleDateString('en-US', { dateStyle: 'medium' })}
                   </p>
                 </div>
+                {user?.id !== member.user_id && (
+                  <Button size="sm" variant="ghost" className="text-primary"
+                    onClick={(e) => { e.stopPropagation(); setPersonalChatUserId(member.user_id); }}>
+                    <MessageCircle className="w-4 h-4" />
+                  </Button>
+                )}
               </div>
             </Card>
           ))}
