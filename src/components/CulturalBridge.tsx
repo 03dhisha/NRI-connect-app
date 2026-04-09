@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Switch } from '@/components/ui/switch';
-import { Users, Calendar, MapPin, Plus, Clock, Star, ChefHat, ExternalLink, Send, ArrowLeft, Heart, User, Trash2 } from 'lucide-react';
+import { Users, Calendar, MapPin, Plus, Clock, Star, ChefHat, ExternalLink, Send, ArrowLeft, Heart, User, Trash2, MessageCircle } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -16,6 +16,8 @@ import { toast } from 'sonner';
 import PageHeader from '@/components/PageHeader';
 import { useFavorites } from '@/hooks/useFavorites';
 import { useActivityLog } from '@/hooks/useActivityLog';
+import MemberProfile from '@/components/MemberProfile';
+import PersonalChat from '@/components/PersonalChat';
 
 interface CulturalBridgeProps {
   defaultTab?: string;
