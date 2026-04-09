@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Switch } from '@/components/ui/switch';
-import { Users, Calendar, MapPin, Plus, Clock, Star, ChefHat, ExternalLink, Send, ArrowLeft, Heart, User, Trash2 } from 'lucide-react';
+import { Users, Calendar, MapPin, Plus, Clock, Star, ChefHat, ExternalLink, Send, ArrowLeft, Heart, User, Trash2, MessageCircle } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -16,6 +16,8 @@ import { toast } from 'sonner';
 import PageHeader from '@/components/PageHeader';
 import { useFavorites } from '@/hooks/useFavorites';
 import { useActivityLog } from '@/hooks/useActivityLog';
+import MemberProfile from '@/components/MemberProfile';
+import PersonalChat from '@/components/PersonalChat';
 
 interface CulturalBridgeProps {
   defaultTab?: string;
@@ -53,6 +55,10 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
   const [viewingMembersGroup, setViewingMembersGroup] = useState<any | null>(null);
   const [groupMembers, setGroupMembers] = useState<any[]>([]);
   const [loadingMembers, setLoadingMembers] = useState(false);
+
+  // Member profile & personal chat state
+  const [viewingProfileUserId, setViewingProfileUserId] = useState<string | null>(null);
+  const [personalChatUserId, setPersonalChatUserId] = useState<string | null>(null);
 
   // Group chat state
   const [openGroupChat, setOpenGroupChat] = useState<any | null>(null);
@@ -323,6 +329,30 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
     toast.success('Restaurant deleted');
   };
 
+  // Personal Chat View
+  if (personalChatUserId) {
+    return (
+      <PersonalChat
+        otherUserId={personalChatUserId}
+        onBack={() => setPersonalChatUserId(null)}
+      />
+    );
+  }
+
+  // Member Profile View
+  if (viewingProfileUserId) {
+    return (
+      <MemberProfile
+        userId={viewingProfileUserId}
+        onBack={() => setViewingProfileUserId(null)}
+        onStartChat={(uid) => {
+          setViewingProfileUserId(null);
+          setPersonalChatUserId(uid);
+        }}
+      />
+    );
+  }
+
   // Group Members View
   if (viewingMembersGroup) {
     return (
@@ -333,7 +363,7 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
           </Button>
           <div>
             <h2 className="font-semibold text-foreground">{viewingMembersGroup.name}</h2>
-            <p className="text-xs text-muted-foreground">Members</p>
+            <p className="text-xs text-muted-foreground">{groupMembers.length} Members</p>
           </div>
         </div>
         <div className="px-6 py-4 space-y-3">
@@ -342,7 +372,8 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
             <p className="text-center text-muted-foreground py-8">No members yet.</p>
           )}
           {groupMembers.map((member) => (
-            <Card key={member.user_id} className="p-4 shadow-card border-0">
+            <Card key={member.user_id} className="p-4 shadow-card border-0 cursor-pointer hover:bg-muted/30 transition-colors"
+              onClick={() => setViewingProfileUserId(member.user_id)}>
               <div className="flex items-center space-x-3">
                 <Avatar className="w-10 h-10">
                   <AvatarFallback className="bg-primary/10 text-primary font-semibold">
@@ -360,6 +391,12 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
                     Joined {new Date(member.joined_at).toLocaleDateString('en-US', { dateStyle: 'medium' })}
                   </p>
                 </div>
+                {user?.id !== member.user_id && (
+                  <Button size="sm" variant="ghost" className="text-primary"
+                    onClick={(e) => { e.stopPropagation(); setPersonalChatUserId(member.user_id); }}>
+                    <MessageCircle className="w-4 h-4" />
+                  </Button>
+                )}
               </div>
             </Card>
           ))}
@@ -451,7 +488,10 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-2">
-                      <h3 className="font-semibold text-foreground">{group.name}</h3>
+                      <h3 className={`font-semibold text-foreground ${joinedGroupIds.has(group.id) ? 'cursor-pointer hover:text-primary transition-colors' : ''}`}
+                        onClick={() => joinedGroupIds.has(group.id) && openChat(group)}>
+                        {group.name}
+                      </h3>
                       <Badge variant="secondary" className="text-xs">{group.category}</Badge>
                     </div>
                     <p className="text-sm text-muted-foreground mb-3">{group.description}</p>
@@ -465,14 +505,9 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
                     {joinedGroupIds.has(group.id) ? 'Joined' : 'Join Group'}
                   </Button>
                   {joinedGroupIds.has(group.id) && (
-                    <>
-                      <Button size="sm" variant="ghost" className="text-primary" onClick={() => openChat(group)}>
-                        Open Chat
-                      </Button>
-                      <Button size="sm" variant="ghost" className="text-muted-foreground" onClick={() => openMembers(group)}>
-                        <User className="w-4 h-4 mr-1" />Members
-                      </Button>
-                    </>
+                    <Button size="sm" variant="ghost" className="text-muted-foreground" onClick={() => openMembers(group)}>
+                      <User className="w-4 h-4 mr-1" />Members
+                    </Button>
                   )}
                 </div>
               </Card>
