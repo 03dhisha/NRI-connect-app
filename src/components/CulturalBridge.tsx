@@ -488,7 +488,10 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-2">
-                      <h3 className="font-semibold text-foreground">{group.name}</h3>
+                      <h3 className={`font-semibold text-foreground ${joinedGroupIds.has(group.id) ? 'cursor-pointer hover:text-primary transition-colors' : ''}`}
+                        onClick={() => joinedGroupIds.has(group.id) && openChat(group)}>
+                        {group.name}
+                      </h3>
                       <Badge variant="secondary" className="text-xs">{group.category}</Badge>
                     </div>
                     <p className="text-sm text-muted-foreground mb-3">{group.description}</p>
@@ -502,14 +505,9 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
                     {joinedGroupIds.has(group.id) ? 'Joined' : 'Join Group'}
                   </Button>
                   {joinedGroupIds.has(group.id) && (
-                    <>
-                      <Button size="sm" variant="ghost" className="text-primary" onClick={() => openChat(group)}>
-                        Open Chat
-                      </Button>
-                      <Button size="sm" variant="ghost" className="text-muted-foreground" onClick={() => openMembers(group)}>
-                        <User className="w-4 h-4 mr-1" />Members
-                      </Button>
-                    </>
+                    <Button size="sm" variant="ghost" className="text-muted-foreground" onClick={() => openMembers(group)}>
+                      <User className="w-4 h-4 mr-1" />Members
+                    </Button>
                   )}
                 </div>
               </Card>
