@@ -5,6 +5,7 @@ import nriLogo from '@/assets/nri-logo.png';
 import { useAuth } from '@/contexts/AuthContext';
 import NotificationBell from '@/components/NotificationBell';
 import { supabase } from '@/integrations/supabase/client';
+import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 
 interface HomeScreenProps {
   onNavigate: (tab: string) => void;

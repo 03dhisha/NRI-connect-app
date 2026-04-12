@@ -1,5 +1,6 @@
 import React from 'react';
 import { Home, Search, Users, MessageCircle, User } from 'lucide-react';
+import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 
 interface BottomNavigationProps {
   activeTab: string;
@@ -7,10 +8,12 @@ interface BottomNavigationProps {
 }
 
 const BottomNavigation = ({ activeTab, onTabChange }: BottomNavigationProps) => {
+  const { totalUnread } = useUnreadMessages();
+
   const tabs = [
     { id: 'home', icon: Home, label: 'Home' },
     { id: 'housing', icon: Search, label: 'Housing' },
-    { id: 'cultural', icon: Users, label: 'Cultural' },
+    { id: 'cultural', icon: Users, label: 'Cultural', badge: totalUnread },
     { id: 'communication', icon: MessageCircle, label: 'Assistant' },
     { id: 'profile', icon: User, label: 'Profile' }
   ];
@@ -26,13 +29,20 @@ const BottomNavigation = ({ activeTab, onTabChange }: BottomNavigationProps) => 
             <button
               key={tab.id}
               onClick={() => onTabChange(tab.id)}
-              className={`flex flex-col items-center py-2 px-3 rounded-md transition-all duration-300 ${
+              className={`relative flex flex-col items-center py-2 px-3 rounded-md transition-all duration-300 ${
                 isActive 
                   ? 'text-primary bg-primary/10' 
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              <Icon className={`w-6 h-6 mb-1 ${isActive ? 'scale-110' : ''} transition-transform duration-300`} />
+              <div className="relative">
+                <Icon className={`w-6 h-6 mb-1 ${isActive ? 'scale-110' : ''} transition-transform duration-300`} />
+                {tab.badge && tab.badge > 0 && (
+                  <span className="absolute -top-1.5 -right-2.5 w-5 h-5 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full flex items-center justify-center">
+                    {tab.badge > 9 ? '9+' : tab.badge}
+                  </span>
+                )}
+              </div>
               <span className="text-xs font-medium">{tab.label}</span>
             </button>
           );
