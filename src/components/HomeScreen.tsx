@@ -14,6 +14,7 @@ interface HomeScreenProps {
 
 const HomeScreen = ({ onNavigate, isAdmin }: HomeScreenProps) => {
   const { user } = useAuth();
+  const { totalUnread } = useUnreadMessages();
   const displayName = user?.user_metadata?.display_name || user?.email || 'User';
   const initial = displayName.charAt(0).toUpperCase();
   const [recentActivity, setRecentActivity] = useState<any[]>([]);
@@ -63,8 +64,8 @@ const HomeScreen = ({ onNavigate, isAdmin }: HomeScreenProps) => {
   };
 
   const quickActions = [
-    { id: 'housing', icon: Home, title: 'Find Housing', description: 'Browse available rentals', bgGradient: 'bg-gradient-primary' },
-    { id: 'cultural', icon: Users, title: 'Join Community', description: 'Connect with locals', bgGradient: 'bg-gradient-to-br from-success to-success/80' },
+    { id: 'housing', icon: Home, title: 'Find Housing', description: 'Browse available rentals', bgGradient: 'bg-gradient-primary', badge: 0 },
+    { id: 'cultural', icon: Users, title: 'Join Community', description: 'Connect with locals', bgGradient: 'bg-gradient-to-br from-success to-success/80', badge: totalUnread },
   ];
 
   return (
