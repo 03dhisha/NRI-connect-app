@@ -18,6 +18,7 @@ import { useFavorites } from '@/hooks/useFavorites';
 import { useActivityLog } from '@/hooks/useActivityLog';
 import MemberProfile from '@/components/MemberProfile';
 import PersonalChat from '@/components/PersonalChat';
+import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 
 interface CulturalBridgeProps {
   defaultTab?: string;
@@ -26,6 +27,7 @@ interface CulturalBridgeProps {
 const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
   const { user } = useAuth();
   const { logActivity } = useActivityLog();
+  const { groupDmSenders, markGroupRead, markDmRead } = useUnreadMessages();
   const [activeTab, setActiveTab] = useState(defaultTab || 'community');
   const restFavorites = useFavorites('restaurant');
   const eventFavorites = useFavorites('event');
