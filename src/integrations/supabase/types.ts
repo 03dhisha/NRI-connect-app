@@ -98,6 +98,7 @@ export type Database = {
           conversation_id: string
           created_at: string
           id: string
+          is_read: boolean
           sender_id: string
         }
         Insert: {
@@ -105,6 +106,7 @@ export type Database = {
           conversation_id: string
           created_at?: string
           id?: string
+          is_read?: boolean
           sender_id: string
         }
         Update: {
@@ -112,6 +114,7 @@ export type Database = {
           conversation_id?: string
           created_at?: string
           id?: string
+          is_read?: boolean
           sender_id?: string
         }
         Relationships: [
@@ -252,6 +255,7 @@ export type Database = {
           display_name: string | null
           group_id: string
           id: string
+          is_read: boolean
           user_id: string
         }
         Insert: {
@@ -260,6 +264,7 @@ export type Database = {
           display_name?: string | null
           group_id: string
           id?: string
+          is_read?: boolean
           user_id: string
         }
         Update: {
@@ -268,6 +273,7 @@ export type Database = {
           display_name?: string | null
           group_id?: string
           id?: string
+          is_read?: boolean
           user_id?: string
         }
         Relationships: [
