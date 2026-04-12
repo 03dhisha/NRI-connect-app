@@ -18,6 +18,7 @@ import { useFavorites } from '@/hooks/useFavorites';
 import { useActivityLog } from '@/hooks/useActivityLog';
 import MemberProfile from '@/components/MemberProfile';
 import PersonalChat from '@/components/PersonalChat';
+import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 
 interface CulturalBridgeProps {
   defaultTab?: string;
@@ -26,6 +27,7 @@ interface CulturalBridgeProps {
 const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
   const { user } = useAuth();
   const { logActivity } = useActivityLog();
+  const { groupDmSenders, markGroupRead, markDmRead } = useUnreadMessages();
   const [activeTab, setActiveTab] = useState(defaultTab || 'community');
   const restFavorites = useFavorites('restaurant');
   const eventFavorites = useFavorites('event');
@@ -205,6 +207,7 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
   const openChat = async (group: any) => {
     setOpenGroupChat(group);
     await fetchMessages(group.id);
+    markGroupRead(group.id);
   };
 
   const fetchMessages = async (groupId: string) => {
@@ -504,11 +507,16 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
                     onClick={() => handleJoinGroup(group.id)}>
                     {joinedGroupIds.has(group.id) ? 'Joined' : 'Join Group'}
                   </Button>
-                  {joinedGroupIds.has(group.id) && (
-                    <Button size="sm" variant="ghost" className="text-muted-foreground" onClick={() => openMembers(group)}>
+                   {joinedGroupIds.has(group.id) && (
+                    <Button size="sm" variant="ghost" className="text-muted-foreground relative" onClick={() => openMembers(group)}>
                       <User className="w-4 h-4 mr-1" />Members
+                      {(groupDmSenders[group.id] || 0) > 0 && (
+                        <span className="absolute -top-1 -right-1 w-5 h-5 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full flex items-center justify-center">
+                          {groupDmSenders[group.id] > 9 ? '9+' : groupDmSenders[group.id]}
+                        </span>
+                      )}
                     </Button>
-                  )}
+                   )}
                 </div>
               </Card>
             ))}

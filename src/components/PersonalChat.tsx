@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { ArrowLeft, Send } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 
 interface PersonalChatProps {
   otherUserId: string;
@@ -13,6 +14,7 @@ interface PersonalChatProps {
 
 const PersonalChat = ({ otherUserId, onBack }: PersonalChatProps) => {
   const { user } = useAuth();
+  const { markDmRead } = useUnreadMessages();
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [messages, setMessages] = useState<any[]>([]);
   const [newMessage, setNewMessage] = useState('');
@@ -54,6 +56,8 @@ const PersonalChat = ({ otherUserId, onBack }: PersonalChatProps) => {
           .eq('conversation_id', conv.id)
           .order('created_at', { ascending: true });
         setMessages(msgs || []);
+        // Mark messages as read
+        markDmRead(conv.id);
       }
       setLoading(false);
       setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
@@ -72,6 +76,10 @@ const PersonalChat = ({ otherUserId, onBack }: PersonalChatProps) => {
       }, (payload) => {
         setMessages(prev => [...prev, payload.new]);
         setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
+        // Mark as read if sender is not the current user
+        if ((payload.new as any).sender_id !== user?.id) {
+          markDmRead(conversationId);
+        }
       })
       .subscribe();
     return () => { supabase.removeChannel(channel); };
