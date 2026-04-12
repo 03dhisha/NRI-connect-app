@@ -76,6 +76,10 @@ const PersonalChat = ({ otherUserId, onBack }: PersonalChatProps) => {
       }, (payload) => {
         setMessages(prev => [...prev, payload.new]);
         setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
+        // Mark as read if sender is not the current user
+        if ((payload.new as any).sender_id !== user?.id) {
+          markDmRead(conversationId);
+        }
       })
       .subscribe();
     return () => { supabase.removeChannel(channel); };
