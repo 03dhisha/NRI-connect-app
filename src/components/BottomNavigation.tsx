@@ -1,6 +1,5 @@
 import React from 'react';
 import { Home, Search, Users, MessageCircle, User } from 'lucide-react';
-import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 
 interface BottomNavigationProps {
   activeTab: string;
@@ -8,12 +7,10 @@ interface BottomNavigationProps {
 }
 
 const BottomNavigation = ({ activeTab, onTabChange }: BottomNavigationProps) => {
-  const { totalUnread } = useUnreadMessages();
-
   const tabs = [
     { id: 'home', icon: Home, label: 'Home' },
     { id: 'housing', icon: Search, label: 'Housing' },
-    { id: 'cultural', icon: Users, label: 'Cultural', badge: totalUnread },
+    { id: 'cultural', icon: Users, label: 'Cultural' },
     { id: 'communication', icon: MessageCircle, label: 'Assistant' },
     { id: 'profile', icon: User, label: 'Profile' }
   ];

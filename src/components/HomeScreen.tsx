@@ -5,7 +5,7 @@ import nriLogo from '@/assets/nri-logo.png';
 import { useAuth } from '@/contexts/AuthContext';
 import NotificationBell from '@/components/NotificationBell';
 import { supabase } from '@/integrations/supabase/client';
-import { useUnreadMessages } from '@/hooks/useUnreadMessages';
+
 
 interface HomeScreenProps {
   onNavigate: (tab: string) => void;
@@ -14,7 +14,7 @@ interface HomeScreenProps {
 
 const HomeScreen = ({ onNavigate, isAdmin }: HomeScreenProps) => {
   const { user } = useAuth();
-  const { totalUnread } = useUnreadMessages();
+  
   const displayName = user?.user_metadata?.display_name || user?.email || 'User';
   const initial = displayName.charAt(0).toUpperCase();
   const [recentActivity, setRecentActivity] = useState<any[]>([]);
@@ -64,8 +64,8 @@ const HomeScreen = ({ onNavigate, isAdmin }: HomeScreenProps) => {
   };
 
   const quickActions = [
-    { id: 'housing', icon: Home, title: 'Find Housing', description: 'Browse available rentals', bgGradient: 'bg-gradient-primary', badge: 0 },
-    { id: 'cultural', icon: Users, title: 'Join Community', description: 'Connect with locals', bgGradient: 'bg-gradient-to-br from-success to-success/80', badge: totalUnread },
+    { id: 'housing', icon: Home, title: 'Find Housing', description: 'Browse available rentals', bgGradient: 'bg-gradient-primary' },
+    { id: 'cultural', icon: Users, title: 'Join Community', description: 'Connect with locals', bgGradient: 'bg-gradient-to-br from-success to-success/80' },
   ];
 
   return (
@@ -91,13 +91,8 @@ const HomeScreen = ({ onNavigate, isAdmin }: HomeScreenProps) => {
           {quickActions.map((action) => (
             <Card key={action.id} className="border-0 overflow-hidden shadow-card rounded-lg">
               <button onClick={() => onNavigate(action.id)} className="w-full p-6 text-left hover:scale-105 transition-all duration-300 relative">
-                <div className={`w-12 h-12 ${action.bgGradient} rounded-md flex items-center justify-center mb-4 relative`}>
+                <div className={`w-12 h-12 ${action.bgGradient} rounded-md flex items-center justify-center mb-4`}>
                   <action.icon className="w-6 h-6 text-white" />
-                  {action.badge > 0 && (
-                    <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full flex items-center justify-center">
-                      {action.badge > 9 ? '9+' : action.badge}
-                    </span>
-                  )}
                 </div>
                 <h3 className="font-semibold text-foreground mb-2">{action.title}</h3>
                 <p className="text-sm text-muted-foreground">{action.description}</p>
