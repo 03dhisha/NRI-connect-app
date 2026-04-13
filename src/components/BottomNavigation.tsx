@@ -34,11 +34,6 @@ const BottomNavigation = ({ activeTab, onTabChange }: BottomNavigationProps) => 
             >
               <div className="relative">
                 <Icon className={`w-6 h-6 mb-1 ${isActive ? 'scale-110' : ''} transition-transform duration-300`} />
-                {tab.badge && tab.badge > 0 && (
-                  <span className="absolute -top-1.5 -right-2.5 w-5 h-5 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full flex items-center justify-center">
-                    {tab.badge > 9 ? '9+' : tab.badge}
-                  </span>
-                )}
               </div>
               <span className="text-xs font-medium">{tab.label}</span>
             </button>
