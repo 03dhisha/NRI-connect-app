@@ -4,10 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useNotifications } from '@/hooks/useNotifications';
+import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 import { formatDistanceToNow } from 'date-fns';
 
 const NotificationBell = () => {
   const { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification } = useNotifications();
+  const { totalUnread } = useUnreadMessages();
+  const totalBadge = unreadCount + totalUnread;
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -17,9 +20,9 @@ const NotificationBell = () => {
         className="relative w-10 h-10 flex items-center justify-center rounded-full hover:bg-muted transition-colors"
       >
         <Bell className="w-5 h-5 text-foreground" />
-        {unreadCount > 0 && (
+        {totalBadge > 0 && (
           <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full flex items-center justify-center">
-            {unreadCount > 9 ? '9+' : unreadCount}
+            {totalBadge > 9 ? '9+' : totalBadge}
           </span>
         )}
       </button>
