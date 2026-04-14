@@ -47,19 +47,6 @@ const CulturalBridge = ({ defaultTab, pendingChat, onChatOpened }: CulturalBridg
     if (defaultTab) setActiveTab(defaultTab);
   }, [defaultTab]);
 
-  // Handle pending chat from notification bell
-  useEffect(() => {
-    if (!pendingChat) return;
-    if (pendingChat.type === 'dm' && pendingChat.otherUserId) {
-      setPersonalChatUserId(pendingChat.otherUserId);
-    } else if (pendingChat.type === 'group') {
-      const group = groups.find(g => g.id === pendingChat.id);
-      if (group) {
-        openChat(group);
-      }
-    }
-    onChatOpened?.();
-  }, [pendingChat, groups]);
 
   // Community state
   const [groups, setGroups] = useState<any[]>([]);
