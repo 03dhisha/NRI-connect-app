@@ -27,7 +27,7 @@ interface CulturalBridgeProps {
 const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
   const { user } = useAuth();
   const { logActivity } = useActivityLog();
-  const { groupDmSenders, markGroupRead, markDmRead } = useUnreadMessages();
+  const { groupDmSenders, markGroupRead, markDmRead, perSenderUnread } = useUnreadMessages();
   const [activeTab, setActiveTab] = useState(defaultTab || 'community');
   const restFavorites = useFavorites('restaurant');
   const eventFavorites = useFavorites('event');
@@ -395,10 +395,17 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
                   </p>
                 </div>
                 {user?.id !== member.user_id && (
-                  <Button size="sm" variant="ghost" className="text-primary"
-                    onClick={(e) => { e.stopPropagation(); setPersonalChatUserId(member.user_id); }}>
-                    <MessageCircle className="w-4 h-4" />
-                  </Button>
+                  <div className="relative">
+                    <Button size="sm" variant="ghost" className="text-primary"
+                      onClick={(e) => { e.stopPropagation(); setPersonalChatUserId(member.user_id); }}>
+                      <MessageCircle className="w-4 h-4" />
+                    </Button>
+                    {(perSenderUnread[member.user_id] || 0) > 0 && (
+                      <span className="absolute -top-1 -right-1 w-5 h-5 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full flex items-center justify-center">
+                        {perSenderUnread[member.user_id] > 9 ? '9+' : perSenderUnread[member.user_id]}
+                      </span>
+                    )}
+                  </div>
                 )}
               </div>
             </Card>
