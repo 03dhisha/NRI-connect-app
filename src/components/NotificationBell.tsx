@@ -3,7 +3,7 @@ import { Bell, Check, Trash2, X, MessageCircle, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useNotifications } from '@/hooks/useNotifications';
-import { useUnreadMessages } from '@/hooks/useUnreadMessages';
+import { useUnreadMessages } from '@/contexts/UnreadMessagesContext';
 import { formatDistanceToNow } from 'date-fns';
 
 interface NotificationBellProps {
