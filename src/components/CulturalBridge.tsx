@@ -22,9 +22,11 @@ import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 
 interface CulturalBridgeProps {
   defaultTab?: string;
+  pendingChat?: { type: 'dm' | 'group'; id: string; otherUserId?: string } | null;
+  onChatOpened?: () => void;
 }
 
-const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
+const CulturalBridge = ({ defaultTab, pendingChat, onChatOpened }: CulturalBridgeProps) => {
   const { user } = useAuth();
   const { logActivity } = useActivityLog();
   const { groupDmSenders, markGroupRead, markDmRead, perSenderUnread } = useUnreadMessages();
