@@ -213,6 +213,21 @@ const CulturalBridge = ({ defaultTab, pendingChat, onChatOpened }: CulturalBridg
     markGroupRead(group.id);
   };
 
+  // Handle pending chat from notification bell
+  useEffect(() => {
+    if (!pendingChat || groups.length === 0) return;
+    if (pendingChat.type === 'dm' && pendingChat.otherUserId) {
+      setPersonalChatUserId(pendingChat.otherUserId);
+      onChatOpened?.();
+    } else if (pendingChat.type === 'group') {
+      const group = groups.find(g => g.id === pendingChat.id);
+      if (group) {
+        openChat(group);
+        onChatOpened?.();
+      }
+    }
+  }, [pendingChat, groups]);
+
   const fetchMessages = async (groupId: string) => {
     const { data } = await supabase.from('group_messages').select('*').eq('group_id', groupId).order('created_at', { ascending: true });
     if (data) setMessages(data);
