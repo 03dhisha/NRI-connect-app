@@ -24,7 +24,7 @@ interface UnreadCounts {
   unreadConversations: UnreadConversation[];
 }
 
-export function useUnreadMessages() {
+export function useUnreadMessagesInternal() {
   const { user } = useAuth();
   const [counts, setCounts] = useState<UnreadCounts>({
     totalUnread: 0, dmUnread: 0, groupUnread: 0, dmUniqueSenders: 0,

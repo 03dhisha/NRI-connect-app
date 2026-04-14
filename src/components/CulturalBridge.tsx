@@ -18,7 +18,7 @@ import { useFavorites } from '@/hooks/useFavorites';
 import { useActivityLog } from '@/hooks/useActivityLog';
 import MemberProfile from '@/components/MemberProfile';
 import PersonalChat from '@/components/PersonalChat';
-import { useUnreadMessages } from '@/hooks/useUnreadMessages';
+import { useUnreadMessages } from '@/contexts/UnreadMessagesContext';
 
 interface CulturalBridgeProps {
   defaultTab?: string;
