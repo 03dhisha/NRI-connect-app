@@ -10,9 +10,10 @@ import { supabase } from '@/integrations/supabase/client';
 interface HomeScreenProps {
   onNavigate: (tab: string) => void;
   isAdmin?: boolean;
+  onOpenChat?: (type: 'dm' | 'group', id: string, otherUserId?: string) => void;
 }
 
-const HomeScreen = ({ onNavigate, isAdmin }: HomeScreenProps) => {
+const HomeScreen = ({ onNavigate, isAdmin, onOpenChat }: HomeScreenProps) => {
   const { user } = useAuth();
   
   const displayName = user?.user_metadata?.display_name || user?.email || 'User';
@@ -80,7 +81,7 @@ const HomeScreen = ({ onNavigate, isAdmin }: HomeScreenProps) => {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <NotificationBell />
+            <NotificationBell onOpenChat={onOpenChat} />
             <button onClick={() => onNavigate('profile')} className="w-10 h-10 bg-gradient-primary rounded-full flex items-center justify-center">
               <span className="text-white font-semibold text-sm">{initial}</span>
             </button>

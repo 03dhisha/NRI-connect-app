@@ -20,6 +20,7 @@ const Index = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [showAdminDash, setShowAdminDash] = useState(false);
   const [showFavorites, setShowFavorites] = useState(false);
+  const [pendingChat, setPendingChat] = useState<{ type: 'dm' | 'group'; id: string; otherUserId?: string } | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -99,20 +100,28 @@ const Index = () => {
     );
   }
 
+  const handleOpenChat = (type: 'dm' | 'group', id: string, otherUserId?: string) => {
+    setPendingChat({ type, id, otherUserId });
+    setCulturalDefaultTab('community');
+    setActiveTab('cultural');
+    setShowAdminDash(false);
+    setShowFavorites(false);
+  };
+
   const renderActiveScreen = () => {
     switch (activeTab) {
       case 'home':
-        return <HomeScreen onNavigate={handleNavigate} isAdmin={isAdmin} />;
+        return <HomeScreen onNavigate={handleNavigate} isAdmin={isAdmin} onOpenChat={handleOpenChat} />;
       case 'housing':
         return <HousingNavigator />;
       case 'cultural':
-        return <CulturalBridge defaultTab={culturalDefaultTab} />;
+        return <CulturalBridge defaultTab={culturalDefaultTab} pendingChat={pendingChat} onChatOpened={() => setPendingChat(null)} />;
       case 'communication':
         return <CommunicationAssistant />;
       case 'profile':
         return <ProfileSettings onLogout={handleLogout} />;
       default:
-        return <HomeScreen onNavigate={handleNavigate} isAdmin={isAdmin} />;
+        return <HomeScreen onNavigate={handleNavigate} isAdmin={isAdmin} onOpenChat={handleOpenChat} />;
     }
   };
 

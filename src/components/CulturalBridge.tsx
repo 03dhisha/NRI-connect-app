@@ -22,12 +22,14 @@ import { useUnreadMessages } from '@/hooks/useUnreadMessages';
 
 interface CulturalBridgeProps {
   defaultTab?: string;
+  pendingChat?: { type: 'dm' | 'group'; id: string; otherUserId?: string } | null;
+  onChatOpened?: () => void;
 }
 
-const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
+const CulturalBridge = ({ defaultTab, pendingChat, onChatOpened }: CulturalBridgeProps) => {
   const { user } = useAuth();
   const { logActivity } = useActivityLog();
-  const { groupDmSenders, markGroupRead, markDmRead } = useUnreadMessages();
+  const { groupDmSenders, markGroupRead, markDmRead, perSenderUnread } = useUnreadMessages();
   const [activeTab, setActiveTab] = useState(defaultTab || 'community');
   const restFavorites = useFavorites('restaurant');
   const eventFavorites = useFavorites('event');
@@ -44,6 +46,7 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
   useEffect(() => {
     if (defaultTab) setActiveTab(defaultTab);
   }, [defaultTab]);
+
 
   // Community state
   const [groups, setGroups] = useState<any[]>([]);
@@ -209,6 +212,21 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
     await fetchMessages(group.id);
     markGroupRead(group.id);
   };
+
+  // Handle pending chat from notification bell
+  useEffect(() => {
+    if (!pendingChat || groups.length === 0) return;
+    if (pendingChat.type === 'dm' && pendingChat.otherUserId) {
+      setPersonalChatUserId(pendingChat.otherUserId);
+      onChatOpened?.();
+    } else if (pendingChat.type === 'group') {
+      const group = groups.find(g => g.id === pendingChat.id);
+      if (group) {
+        openChat(group);
+        onChatOpened?.();
+      }
+    }
+  }, [pendingChat, groups]);
 
   const fetchMessages = async (groupId: string) => {
     const { data } = await supabase.from('group_messages').select('*').eq('group_id', groupId).order('created_at', { ascending: true });
@@ -395,10 +413,17 @@ const CulturalBridge = ({ defaultTab }: CulturalBridgeProps) => {
                   </p>
                 </div>
                 {user?.id !== member.user_id && (
-                  <Button size="sm" variant="ghost" className="text-primary"
-                    onClick={(e) => { e.stopPropagation(); setPersonalChatUserId(member.user_id); }}>
-                    <MessageCircle className="w-4 h-4" />
-                  </Button>
+                  <div className="relative">
+                    <Button size="sm" variant="ghost" className="text-primary"
+                      onClick={(e) => { e.stopPropagation(); setPersonalChatUserId(member.user_id); }}>
+                      <MessageCircle className="w-4 h-4" />
+                    </Button>
+                    {(perSenderUnread[member.user_id] || 0) > 0 && (
+                      <span className="absolute -top-1 -right-1 w-5 h-5 bg-destructive text-destructive-foreground text-[10px] font-bold rounded-full flex items-center justify-center">
+                        {perSenderUnread[member.user_id] > 9 ? '9+' : perSenderUnread[member.user_id]}
+                      </span>
+                    )}
+                  </div>
                 )}
               </div>
             </Card>
