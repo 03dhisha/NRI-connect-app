@@ -328,12 +328,8 @@ const CulturalBridge = ({ defaultTab, pendingChat, onChatOpened }: CulturalBridg
       { onConflict: 'restaurant_id,user_id' }
     );
     setUserRestRatings(prev => ({ ...prev, [restaurantId]: rating }));
-    const { data } = await supabase.from('restaurant_ratings').select('rating').eq('restaurant_id', restaurantId);
-    if (data && data.length > 0) {
-      const avg = data.reduce((sum: number, r: any) => sum + r.rating, 0) / data.length;
-      await supabase.from('restaurants').update({ average_rating: avg, total_ratings: data.length }).eq('id', restaurantId);
-      fetchRestaurants();
-    }
+    await (supabase as any).rpc('recompute_restaurant_rating', { _restaurant_id: restaurantId });
+    fetchRestaurants();
   };
 
   const handleDeleteEvent = async (eventId: string) => {

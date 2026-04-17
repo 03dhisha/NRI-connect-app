@@ -546,6 +546,14 @@ export type Database = {
         }
         Returns: boolean
       }
+      recompute_housing_rating: {
+        Args: { _listing_id: string }
+        Returns: undefined
+      }
+      recompute_restaurant_rating: {
+        Args: { _restaurant_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "user"

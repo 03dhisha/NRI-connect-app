@@ -151,12 +151,8 @@ const HousingNavigator = () => {
     );
     if (!error) {
       setUserRatings(prev => ({ ...prev, [listingId]: rating }));
-      const { data } = await supabase.from('housing_ratings').select('rating').eq('listing_id', listingId);
-      if (data && data.length > 0) {
-        const avg = data.reduce((sum: number, r: any) => sum + r.rating, 0) / data.length;
-        await supabase.from('housing_listings').update({ average_rating: avg, total_ratings: data.length }).eq('id', listingId);
-        fetchListings();
-      }
+      await (supabase as any).rpc('recompute_housing_rating', { _listing_id: listingId });
+      fetchListings();
     }
   };
 
