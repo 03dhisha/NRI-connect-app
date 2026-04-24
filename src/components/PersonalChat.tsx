@@ -69,7 +69,7 @@ const PersonalChat = ({ otherUserId, onBack }: PersonalChatProps) => {
   useEffect(() => {
     if (!conversationId) return;
     const channel = supabase
-      .channel(`dm-${conversationId}`)
+      .channel(`dm-${conversationId}`, { config: { private: true } })
       .on('postgres_changes', {
         event: 'INSERT', schema: 'public', table: 'direct_messages',
         filter: `conversation_id=eq.${conversationId}`,
