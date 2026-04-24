@@ -177,7 +177,7 @@ export function useUnreadMessagesInternal() {
   useEffect(() => {
     if (!user) return;
     const channel = supabase
-      .channel('unread-tracking')
+      .channel('unread-tracking', { config: { private: true } })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'direct_messages' }, () => fetchCounts())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'group_messages' }, () => fetchCounts())
       .subscribe();
