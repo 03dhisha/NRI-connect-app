@@ -1,0 +1,13 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  VITE_SUPABASE_URL = "https://vxjdyoxfxfzwewlobwnx.supabase.co"
+  VITE_SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ4amR5b3hmeGZ6d2V3bG9id254Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA2MjA4NDEsImV4cCI6MjA4NjE5Njg0MX0.DyljSVJdpfIYMyGHw_6W0EEvsRwCg1H2pbBspY5pI0k"
+
+# SPA redirect - all routes go to index.html
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
