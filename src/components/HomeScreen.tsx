@@ -34,7 +34,7 @@ const HomeScreen = ({ onNavigate, isAdmin, onOpenChat }: HomeScreenProps) => {
     fetchActivity();
 
     const channel = supabase
-      .channel('activity-realtime')
+      .channel('activity-realtime', { config: { private: true } })
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'activity_logs', filter: `user_id=eq.${user.id}` }, (payload) => {
         setRecentActivity(prev => [payload.new as any, ...prev].slice(0, 10));
       })
