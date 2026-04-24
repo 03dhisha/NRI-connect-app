@@ -37,7 +37,7 @@ export function useNotifications() {
   useEffect(() => {
     if (!user) return;
     const channel = supabase
-      .channel('notifications')
+      .channel('notifications', { config: { private: true } })
       .on('postgres_changes', {
         event: 'INSERT',
         schema: 'public',
