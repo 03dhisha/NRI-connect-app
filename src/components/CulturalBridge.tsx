@@ -238,7 +238,7 @@ const CulturalBridge = ({ defaultTab, pendingChat, onChatOpened }: CulturalBridg
   useEffect(() => {
     if (!openGroupChat) return;
     const channel = supabase
-      .channel(`group-messages-${openGroupChat.id}`)
+      .channel(`group-messages-${openGroupChat.id}`, { config: { private: true } })
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'group_messages', filter: `group_id=eq.${openGroupChat.id}` }, (payload) => {
         setMessages(prev => [...prev, payload.new]);
         setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
